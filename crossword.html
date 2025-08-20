@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Интерактивный сканворд с числами</title>
+  <style>
+    :root {
+      --cell-size: 40px;
+      --gap: 2px;
+      --accent: #6b5bfd;
+      --bg: #0f172a;
+      --panel: #111827;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --ok: #10b981;
+      --warn: #f59e0b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Noto Sans', sans-serif;
+      color: var(--text);
+      background: radial-gradient(1000px 800px at 10% -10%, #1f2937, #0b1022) fixed;
+      min-height: 100dvh;
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+
+    /* Панель управления */
+    .toolbar {
+      position: sticky;
+      top: 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: .6rem .8rem;
+      align-items: center;
+      padding: .75rem 1rem;
+      background: linear-gradient(180deg, rgba(17,24,39,.95), rgba(17,24,39,.85));
+      border-bottom: 1px solid #222635;
+      z-index: 5;
+    }
+    .toolbar > * { flex: none; }
+    .toolbar label { font-size: .85rem; color: var(--muted); margin-right:.35rem }
+    .toolbar input[type="text"], .toolbar input[type="number"] {
+      background: #0b1022;
+      color: var(--text);
+      border: 1px solid #2b3247;
+      border-radius: .6rem;
+      padding: .5rem .65rem;
+      min-width: 220px;
+      outline: none;
+    }
+    .toolbar input[type="text"]:focus, .toolbar input[type="number"]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px #6b5bfd22; }
+
+    .btn {
+      border: 1px solid #2b3247;
+      background: #171d36;
+      color: var(--text);
+      padding: .55rem .8rem;
+      border-radius: .8rem;
+      cursor: pointer;
+      transition: transform .06s ease, background .2s ease, border-color .2s ease;
+      user-select: none;
+    }
+    .btn:hover { background: #1c2444; }
+    .btn:active { transform: translateY(1px) scale(.99); }
+    .btn.primary { background: var(--accent); border-color: #5749ff; }
+    .btn.primary:hover { filter: brightness(1.05); }
+    .btn.success { background: var(--ok); border-color: #0ca373; }
+    .btn.warn { background: var(--warn); border-color: #d48a0b; color: #0b1022; }
+
+    .badge { font-size: .78rem; padding: .3rem .5rem; border-radius: .5rem; background:#192042; border:1px solid #2b3247; color:#c7d2fe }
+
+    .wrap {
+      display: grid;
+      place-items: center;
+      padding: 1rem;
+      width: 100%;
+    }
+
+    /* Поле со сканвордом */
+    .board {
+      position: relative;
+      width: min(100%, 900px);
+      aspect-ratio: 597/792; /* пропорции скриншота */
+      background: #0b1022;
+      border-radius: 1rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,.35), inset 0 0 0 1px #243148;
+      overflow: hidden;
+      isolation: isolate;
+    }
+    .bg {
+      position: absolute; inset: 0;
+      background-size: contain; background-position: center; background-repeat: no-repeat;
+      filter: contrast(1.02) saturate(1.05);
+      z-index: 0;
+    }
+
+    /* Ячейки */
+    .cell { position: absolute; z-index: 2; }
+    .cell input {
+      width: var(--cell-size);
+      height: var(--cell-size);
+      text-align: center;
+      font-weight: 700;
+      font-size: calc(var(--cell-size) * .48);
+      letter-spacing: .02em;
+      color: #0b1022;
+      background: #e5f0ff;
+      border: 2px solid #9fb5ff;
+      outline: none;
+      border-radius: .6rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,.25);
+    }
+
+    /* В режиме редактирования добавляем ручку перетаскивания */
+    .cell.editable::after {
+      content: "✥"; position: absolute; right: -10px; top: -10px; width: 24px; height: 24px;
+      display: grid; place-items:center; background: #0ea5e9; color: white; border-radius: 999px;
+      font-size: 12px; box-shadow: 0 4px 10px rgba(0,0,0,.35);
+      cursor: grab; border:2px solid #075985;
+    }
+
+    /* всплывающие подсказки */
+    .hint { font-size: .8rem; color: var(--muted); margin-top: .4rem; text-align: center; }
+
+    /* небольшая помощь для тача */
+    @media (hover: none) { .cell input { font-size: calc(var(--cell-size) * .44); } }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <span class="badge" id="modeBadge">Режим: ученик</span>
+
+    <button class="btn" id="toggleEdit">Включить редактирование</button>
+
+    <label for="imgUrl">Фон:</label>
+    <input id="imgUrl" type="text" placeholder="Вставьте ссылку на картинку (PNG/JPG)" />
+    <button class="btn" id="applyBg">Применить</button>
+
+    <label for="cellSize">Размер клетки:</label>
+    <input id="cellSize" type="number" min="24" max="80" step="2" value="40" />
+    <button class="btn" id="addCell">Добавить клетку</button>
+    <button class="btn" id="clearCells" title="Удалить все клетки">Очистить</button>
+
+    <button class="btn primary" id="share">Ссылка для учеников</button>
+  </div>
+
+  <div class="wrap">
+    <div class="board" id="board">
+      <div class="bg" id="bg"></div>
+      <!-- ячейки добавляются скриптом -->
+    </div>
+    <div class="hint">Подсказка: в режиме <b>редактирования</b> кликом добавляйте клетки, перетаскивайте их за круглую ручку ✥. Правый клик по клетке — удалить. Нажмите «Ссылка для учеников», чтобы сгенерировать ссылку с сохранённой раскладкой.</div>
+  </div>
+
+  <script>
+    // ======= Модель состояния =======
+    const state = {
+      edit: false,
+      bg: '',
+      size: 40,
+      cells: [] // {id, x, y, value}
+    };
+
+    const board = document.getElementById('board');
+    const bg = document.getElementById('bg');
+    const imgUrl = document.getElementById('imgUrl');
+    const cellSizeInput = document.getElementById('cellSize');
+    const modeBadge = document.getElementById('modeBadge');
+
+    // ======= Помощники =======
+    const uid = () => Math.random().toString(36).slice(2, 10);
+    const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+
+    function render() {
+      document.documentElement.style.setProperty('--cell-size', state.size + 'px');
+      bg.style.backgroundImage = state.bg ? `url("${state.bg}")` : 'none';
+      // очистка и рендер ячеек
+      [...board.querySelectorAll('.cell')].forEach(n => n.remove());
+      for (const c of state.cells) {
+        const el = document.createElement('div');
+        el.className = 'cell' + (state.edit ? ' editable' : '');
+        el.style.left = (c.x * board.clientWidth) + 'px';
+        el.style.top = (c.y * board.clientHeight) + 'px';
+        el.dataset.id = c.id;
+
+        const input = document.createElement('input');
+        input.value = c.value || '';
+        input.placeholder = '';
+        input.disabled = state.edit; // при редактировании ввод блокируем
+        input.addEventListener('input', () => {
+          c.value = input.value;
+          autosave();
+        });
+
+        el.appendChild(input);
+        board.appendChild(el);
+
+        if (state.edit) enableDrag(el, c);
+        if (state.edit) el.addEventListener('contextmenu', (e) => { e.preventDefault(); removeCell(c.id); });
+      }
+      modeBadge.textContent = 'Режим: ' + (state.edit ? 'редактор' : 'ученик');
+    }
+
+    function addCell(xPct, yPct) {
+      state.cells.push({ id: uid(), x: xPct, y: yPct, value: '' });
+      render();
+      autosave();
+    }
+    function removeCell(id) {
+      state.cells = state.cells.filter(c => c.id !== id);
+      render();
+      autosave();
+    }
+
+    function enableDrag(el, c) {
+      let dragging = false, sx = 0, sy = 0, startLeft = 0, startTop = 0;
+      const handle = el; // перетаскиваем за всю ячейку (ручка остаётся как подсказка)
+
+      handle.addEventListener('mousedown', (e) => {
+        if (!state.edit) return;
+        dragging = true; el.style.cursor = 'grabbing';
+        sx = e.clientX; sy = e.clientY;
+        startLeft = parseFloat(el.style.left);
+        startTop = parseFloat(el.style.top);
+        e.preventDefault();
+      });
+      window.addEventListener('mousemove', (e) => {
+        if (!dragging) return;
+        const dx = e.clientX - sx; const dy = e.clientY - sy;
+        let nx = startLeft + dx; let ny = startTop + dy;
+        // границы
+        nx = clamp(nx, 0, board.clientWidth - parseFloat(getComputedStyle(el.firstChild).width));
+        ny = clamp(ny, 0, board.clientHeight - parseFloat(getComputedStyle(el.firstChild).height));
+        el.style.left = nx + 'px';
+        el.style.top = ny + 'px';
+        c.x = nx / board.clientWidth; c.y = ny / board.clientHeight;
+      });
+      window.addEventListener('mouseup', () => {
+        if (dragging) { dragging = false; el.style.cursor = 'grab'; autosave(); }
+      });
+    }
+
+    // ======= Хэш-ссылка (поделиться макетом) =======
+    function encodeLayout() {
+      const payload = { bg: state.bg, size: state.size, cells: state.cells.map(({id,x,y,value})=>({x,y,value})) };
+      return btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+    }
+    function decodeLayout(str) {
+      try { return JSON.parse(decodeURIComponent(escape(atob(str)))) } catch { return null }
+    }
+    function applyLayout(layout) {
+      if (!layout) return;
+      state.bg = layout.bg || '';
+      state.size = layout.size || 40;
+      state.cells = (layout.cells || []).map(c => ({ id: uid(), x: c.x, y: c.y, value: c.value || '' }));
+      imgUrl.value = state.bg || '';
+      cellSizeInput.value = state.size;
+      render();
+    }
+
+    // ======= Автосохранение (локально для ученика) =======
+    const LS_KEY = 'number-crossword-values-v1';
+    function autosave() {
+      const values = state.cells.map(c => c.value || '');
+      try { localStorage.setItem(LS_KEY, JSON.stringify(values)); } catch {}
+    }
+    function loadSavedValues() {
+      try {
+        const raw = localStorage.getItem(LS_KEY); if (!raw) return;
+        const values = JSON.parse(raw);
+        state.cells.forEach((c,i) => { if (values[i] != null) c.value = values[i]; });
+      } catch {}
+    }
+
+    // ======= Инициализация =======
+    function initFromHash() {
+      const m = location.hash.match(/^#layout=(.+)$/);
+      if (m) {
+        const layout = decodeLayout(m[1]);
+        applyLayout(layout);
+        loadSavedValues();
+        return true;
+      }
+      return false;
+    }
+
+    function exportLink() {
+      const token = encodeLayout();
+      const url = location.origin + location.pathname + '#layout=' + token;
+      navigator.clipboard?.writeText(url);
+      alert('Ссылка скопирована в буфер обмена. Отправьте её ученикам!');
+    }
+
+    // ======= Обработчики UI =======
+    document.getElementById('toggleEdit').addEventListener('click', () => {
+      state.edit = !state.edit; render();
+      document.getElementById('toggleEdit').textContent = state.edit ? 'Выключить редактирование' : 'Включить редактирование';
+    });
+
+    document.getElementById('applyBg').addEventListener('click', () => {
+      state.bg = imgUrl.value.trim(); render(); autosave();
+    });
+
+    cellSizeInput.addEventListener('change', () => {
+      const v = parseInt(cellSizeInput.value, 10) || 40;
+      state.size = clamp(v, 24, 80); render(); autosave();
+    });
+
+    document.getElementById('addCell').addEventListener('click', () => {
+      if (!state.edit) { alert('Сначала включите режим редактирования'); return; }
+      // добавим в центр
+      addCell(.5, .5);
+    });
+
+    document.getElementById('clearCells').addEventListener('click', () => {
+      if (!state.edit) { alert('Очистка доступна в режиме редактирования'); return; }
+      if (confirm('Удалить все клетки?')) { state.cells = []; render(); autosave(); }
+    });
+
+    document.getElementById('share').addEventListener('click', exportLink);
+
+    // Добавление клетки по клику на поле (в режиме редактирования)
+    board.addEventListener('click', (e) => {
+      if (!state.edit) return;
+      if (e.target !== board && !e.target.classList.contains('bg')) return; // не по существующей ячейке
+      const rect = board.getBoundingClientRect();
+      const xPct = (e.clientX - rect.left - state.size/2) / board.clientWidth;
+      const yPct = (e.clientY - rect.top - state.size/2) / board.clientHeight;
+      addCell(clamp(xPct, 0, 1), clamp(yPct, 0, 1));
+    });
+
+    // Подгонка позиций при ресайзе окна
+    window.addEventListener('resize', render);
+
+    // Старт: пробуем загрузить макет из URL, иначе покажем примерный фон (можно поменять)
+    const found = initFromHash();
+    if (!found) {
+      // Можно вставить свою картинку в поле «Фон» и нажать «Применить»
+      state.bg = '';
+      render();
+    }
+  </script>
+</body>
+</html>
