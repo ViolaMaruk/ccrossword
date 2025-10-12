@@ -2,7 +2,7 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8">
-  <title>Trener matematyki</title>
+  <title>Trener matematyki — mnożenie</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -21,7 +21,6 @@
       margin-bottom: 30px;
     }
     h1, h2 { margin-bottom: 10px; }
-    .mode-buttons { margin: 20px; }
     .task { font-size: 26px; margin: 20px; }
     input {
       width: 80px;
@@ -31,6 +30,7 @@
       padding: 5px;
       border: 2px solid #aaa;
       border-radius: 5px;
+      transition: all 0.3s;
     }
     input.error { background: #f8d7da; border-color: red; }
     input.correct { background: #d4edda; border-color: green; }
@@ -46,29 +46,54 @@
       flex-direction: column;
       align-items: center;
     }
-    .result { margin: 20px; font-size: 20px; font-weight: bold; }
+    .result { margin: 20px; font-size: 20px; font-weight: bold; transition: color 0.3s; }
     button {
       margin: 10px;
       padding: 10px 20px;
       font-size: 18px;
       cursor: pointer;
+      border-radius: 10px;
+      border: none;
+      background-color: #007bff;
+      color: white;
+      transition: background 0.3s;
+    }
+    button:hover { background-color: #0056b3; }
+    .success-animate { animation: pulse 0.5s ease-in-out; }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
     }
     svg { overflow: visible; }
+
+    /* Popup уровень */
+    #levelUpPopup {
+      display:none;
+      position:fixed;
+      top:50%;
+      left:50%;
+      transform:translate(-50%,-50%);
+      background: rgba(255,255,255,0.95);
+      border: 2px solid #007bff;
+      border-radius:15px;
+      padding:30px;
+      z-index:1000;
+      text-align:center;
+      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    }
   </style>
 </head>
 <body>
-  <!-- Основной тренажер -->
-  <div class="container" id="main-section">
-    <h1>Trener matematyki</h1>
-    <div class="mode-buttons">
-      <button onclick="setMode('multiply')">Mnożenie</button>
-      <button onclick="setMode('divide')">Dzielenie</button>
-      <button onclick="setMode('table')">Tablica mnożenia</button>
-    </div>
+  <div class="container" id="main">
+    <h1>🧮 Trener mnożenia</h1>
 
     <div class="task" id="task"></div>
 
-    <!-- Разделение на десятки и единицы -->
+    <div style="font-size:22px; font-weight:bold; margin-bottom:10px;">
+      Liczba do rozłożenia: <span id="mainNumber"></span>
+    </div>
+
     <div class="row" id="tensRow">
       <div class="block" id="blockTens">
         <input id="tens" placeholder="dziesiątki">
@@ -78,12 +103,10 @@
       </div>
     </div>
 
-    <!-- оператор -->
     <div class="row">
       <div id="operator" style="font-size:22px; font-weight:bold;"></div>
     </div>
 
-    <!-- стрелки к part1 и part2 -->
     <div id="arrowRow" style="display:flex; justify-content:center; gap:200px; margin-bottom:10px;">
       <svg width="400" height="100">
         <defs>
@@ -96,14 +119,12 @@
       </svg>
     </div>
 
-    <!-- part1 и part2 с плюс знаком -->
     <div class="row" id="partRow" style="justify-content:center; gap:10px; margin-bottom:20px;">
       <input id="part1" placeholder="..." style="width:100px; text-align:center;">
       <span style="font-size:24px; font-weight:bold;">+</span>
       <input id="part2" placeholder="..." style="width:100px; text-align:center;">
     </div>
 
-    <!-- стрелки к сумме -->
     <div style="display:flex; justify-content:center; gap:80px; margin-bottom:10px;">
       <svg width="400" height="80">
         <defs>
@@ -121,118 +142,166 @@
     </div>
 
     <div class="result" id="result"></div>
+    <button id="actionBtn">Sprawdź i dalej</button>
+    <div id="stats" style="margin-top:15px; font-weight:bold; color:#333;"></div>
+  </div>
 
-    <button onclick="check()">Sprawdź</button>
-    <button onclick="nextTask()">Dalej</button>
-    <button id="hintBtn" style="display:none;" onclick="showHint()">Podpowiedź</button>
+  <!-- Popup уровень -->
+  <div id="levelUpPopup">
+    <p style="font-size:18px; margin-bottom:20px;">Brawo! 🧠 Chcesz przejść do poziomu 50-99?</p>
+    <button id="levelYes" style="margin-right:10px;">TAK</button>
+    <button id="levelNo">NIE</button>
   </div>
 
   <script>
-    let number, other, tens, ones;
-    let correctPart1, correctPart2, correctFinal;
-    let mode = 'multiply';
+    class MathTrainer {
+      constructor() {
+        this.el = {
+          tens: document.getElementById("tens"),
+          ones: document.getElementById("ones"),
+          part1: document.getElementById("part1"),
+          part2: document.getElementById("part2"),
+          final: document.getElementById("final"),
+          result: document.getElementById("result"),
+          task: document.getElementById("task"),
+          operator: document.getElementById("operator"),
+          stats: document.getElementById("stats"),
+          actionBtn: document.getElementById("actionBtn"),
+          main: document.getElementById("main"),
+          mainNumber: document.getElementById("mainNumber"),
+          popup: document.getElementById("levelUpPopup"),
+          yesBtn: document.getElementById("levelYes"),
+          noBtn: document.getElementById("levelNo")
+        };
 
-    // Таблица умножения
-    let tableHints = [
-      {q: "7 × 6", a: 42},
-      {q: "7 × 9", a: 63},
-      {q: "7 × 8", a: 56},
-      {q: "7 × 5", a: 35}
-    ];
-    let hintIndex = 0;
-    let currentTable = null;
+        this.correct = 0;
+        this.total = 0;
+        this.streak = 0;
+        this.awaitingNext = false;
+        this.startTime = null;
 
-    function setMode(m) {
-      mode = m;
-      nextTask();
-    }
+        this.minNumber = 10;
+        this.maxNumber = 50;
+        this.splitEnabled = true;
 
-    function nextTask() {
-      document.getElementById("result").textContent = "";
-      ["tens","ones","part1","part2","final"].forEach(id => {
-        let el = document.getElementById(id);
-        el.value = "";
-        el.className = "";
-      });
+        this.el.actionBtn.addEventListener("click", () => this.handleAction());
+        this.nextTask();
+      }
 
-      // показываем/скрываем элементы
-      document.getElementById("tensRow").style.display = "flex";
-      document.getElementById("arrowRow").style.display = "flex";
-      document.getElementById("partRow").style.display = "flex";
-      document.getElementById("blockTens").style.display = "flex";
-      document.getElementById("blockOnes").style.display = "flex";
-      document.getElementById("hintBtn").style.display = "none";
+      generateNumbers() {
+        this.number = Math.floor(Math.random() * (this.maxNumber - this.minNumber + 1)) + this.minNumber;
+        this.other = Math.floor(Math.random() * 9) + 1;
+        this.tens = Math.floor(this.number / 10) * 10;
+        this.ones = this.number % 10;
+        this.correctPart1 = this.tens * this.other;
+        this.correctPart2 = this.ones * this.other;
+        this.correctFinal = this.correctPart1 + this.correctPart2;
+      }
 
-      if(mode === 'multiply') {
-        number = Math.floor(Math.random() * 90) + 10;
-        other = Math.floor(Math.random() * 9) + 1;
-        tens = Math.floor(number / 10) * 10;
-        ones = number % 10;
+      nextTask() {
+        this.generateNumbers();
+        this.el.task.textContent = `${this.number} × ${this.other} = ?`;
+        this.el.operator.textContent = `× ${this.other}`;
+        this.el.mainNumber.textContent = this.number;
 
-        document.getElementById("task").textContent = number + " × " + other + " = ?";
-        document.getElementById("operator").textContent = "× " + other;
-        correctPart1 = tens * other;
-        correctPart2 = ones * other;
-        correctFinal = correctPart1 + correctPart2;
+        document.getElementById("tensRow").style.display="flex";
+        document.getElementById("partRow").style.display="flex";
 
-      } else if(mode === 'divide') {
-        document.getElementById("tensRow").style.display = "none";
-        document.getElementById("arrowRow").style.display = "none";
-        document.getElementById("partRow").style.display = "none";
+        this.el.result.textContent = "";
+        this.clearInputs();
+        this.startTime = Date.now();
+        this.el.tens.focus();
+      }
 
-        other = Math.floor(Math.random() * 9) + 1;
-        let k = Math.floor(Math.random() * 9) + 2;
-        number = other * k;
+      clearInputs() {
+        ["tens","ones","part1","part2","final"].forEach(id => {
+          const el = this.el[id];
+          el.value = "";
+          el.className = "";
+        });
+      }
 
-        document.getElementById("task").textContent = number + " ÷ " + other + " = ?";
-        document.getElementById("operator").textContent = "÷ " + other;
-        correctFinal = number / other;
+      handleAction() {
+        if(this.awaitingNext) {
+          this.awaitingNext = false;
+          this.el.actionBtn.textContent = "Sprawdź i dalej";
+          this.nextTask();
+        } else {
+          this.check();
+        }
+      }
 
-      } else if(mode === 'table') {
-        document.getElementById("tensRow").style.display = "none";
-        document.getElementById("arrowRow").style.display = "none";
-        document.getElementById("partRow").style.display = "none";
-        document.getElementById("hintBtn").style.display = "inline-block";
+      check() {
+        const {tens, ones, part1, part2, final, result, stats, main} = this.el;
+        const userTens = parseInt(tens.value);
+        const userOnes = parseInt(ones.value);
+        const userPart1 = parseInt(part1.value);
+        const userPart2 = parseInt(part2.value);
+        const userFinal = parseInt(final.value);
 
-        // следующий пример из таблицы
-        currentTable = tableHints[hintIndex % tableHints.length];
-        document.getElementById("task").textContent = currentTable.q + " = ?";
-        correctFinal = currentTable.a;
-        hintIndex++;
+        let errors = [];
+        let ok = true;
+
+        if(tens.value !== "" && userTens !== this.tens){ tens.className="error"; errors.push("dziesiątki"); ok=false; }
+        else if(tens.value !== "") tens.className="correct";
+
+        if(ones.value !== "" && userOnes !== this.ones){ ones.className="error"; errors.push("jedności"); ok=false; }
+        else if(ones.value !== "") ones.className="correct";
+
+        if(part1.value !== "" && userPart1 !== this.correctPart1){ part1.className="error"; errors.push("część 1"); ok=false; }
+        else if(part1.value !== "") part1.className="correct";
+
+        if(part2.value !== "" && userPart2 !== this.correctPart2){ part2.className="error"; errors.push("część 2"); ok=false; }
+        else if(part2.value !== "") part2.className="correct";
+
+        if(userFinal !== this.correctFinal){ final.className="error"; ok=false; errors.push("wynik końcowy"); }
+        else final.className="correct";
+
+        const elapsed = ((Date.now()-this.startTime)/1000).toFixed(1);
+
+        this.total++;
+        if(ok) {
+          this.correct++;
+          this.streak++;
+          result.style.color="green";
+          result.textContent=`Brawo! 🎉 Poprawna odpowiedź: ${this.correctFinal}`;
+          main.classList.add("success-animate");
+          setTimeout(()=>main.classList.remove("success-animate"),600);
+
+          if(this.streak % 5 === 0){
+            this.el.popup.style.display = "block";
+
+            this.el.yesBtn.onclick = () => {
+              this.minNumber = 50;
+              this.maxNumber = 99;
+              this.awaitingNext = false; // сброс флага, чтобы первый пример проверялся
+              this.el.popup.style.display = "none";
+              this.nextTask();
+            }
+
+            this.el.noBtn.onclick = () => {
+              this.awaitingNext = false; // тоже сброс
+              this.el.popup.style.display = "none";
+              this.nextTask();
+            }
+          }
+
+          if(this.streak % 10 === 0) result.textContent += " 🥇";
+          if(this.streak % 20 === 0) result.textContent += " 🎉";
+
+          this.awaitingNext=true;
+          this.el.actionBtn.textContent="Następny przykład →";
+        } else {
+          this.streak = 0;
+          result.style.color="red";
+          result.textContent=`Błąd w: ${errors.join(", ")}. Spróbuj ponownie!`;
+        }
+
+        stats.textContent=`Poprawnych: ${this.correct}/${this.total} (${Math.round(this.correct/this.total*100)}%), czas: ${elapsed}s`;
       }
     }
 
-    function check() {
-      let userFinal = parseInt(document.getElementById("final").value);
-      document.getElementById("final").className = "";
-      let ok = true;
-
-      if(mode === 'multiply') {
-        let userTens = parseInt(document.getElementById("tens").value);
-        let userOnes = parseInt(document.getElementById("ones").value);
-        let userPart1 = parseInt(document.getElementById("part1").value);
-        let userPart2 = parseInt(document.getElementById("part2").value);
-
-        if(userTens !== tens){ document.getElementById("tens").className="error"; ok=false; } else document.getElementById("tens").className="correct";
-        if(userOnes !== ones){ document.getElementById("ones").className="error"; ok=false; } else document.getElementById("ones").className="correct";
-        if(userPart1 !== correctPart1){ document.getElementById("part1").className="error"; ok=false; } else document.getElementById("part1").className="correct";
-        if(userPart2 !== correctPart2){ document.getElementById("part2").className="error"; ok=false; } else document.getElementById("part2").className="correct";
-        if(userFinal !== correctFinal){ document.getElementById("final").className="error"; ok=false; } else document.getElementById("final").className="correct";
-
-      } else {
-        if(userFinal !== correctFinal){ document.getElementById("final").className="error"; ok=false; } else document.getElementById("final").className="correct";
-      }
-
-      document.getElementById("result").textContent = ok ? "Brawo! 🎉 Poprawna odpowiedź: " + correctFinal : "Spróbuj ponownie. Poprawna odpowiedź: " + correctFinal;
-      document.getElementById("result").style.color = ok ? "green" : "red";
-    }
-
-    function showHint() {
-      // показывает следующий пример с ответом в таблице
-      document.getElementById("task").textContent = currentTable.q + " = " + currentTable.a;
-    }
-
-    nextTask();
+    new MathTrainer();
   </script>
 </body>
 </html>
