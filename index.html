@@ -112,8 +112,14 @@
         }
         button:hover { background-color: #2980b9; }
         button:active { transform: scale(0.97); }
+        
         button.btn-hint { background-color: #f39c12; }
         button.btn-hint:hover { background-color: #d68910; }
+        
+        /* Стиль для новой кнопки ответа */
+        button.btn-answer { background-color: #9b59b6; }
+        button.btn-answer:hover { background-color: #8e44ad; }
+
         .feedback {
             font-weight: bold;
             margin-left: 10px;
@@ -257,10 +263,14 @@
         ];
 
         const container = document.getElementById("tasks-container");
+        
+        // Объект для хранения количества неправильных попыток для каждого задания
+        let attemptCounts = {};
 
         tasksData.forEach((task, index) => {
             const taskNum = index + 1;
             const answersJson = JSON.stringify(task.answers).replace(/"/g, "'");
+            const firstAnswer = task.answers[0]; // Берем первый вариант ответа для кнопки-шпаргалки
 
             const taskHTML = `
                 <div class="task-card" id="card${taskNum}">
@@ -269,8 +279,11 @@
                     </div>
                     <div class="input-group">
                         <input type="text" id="input${taskNum}" placeholder="Wpisz równanie...">
-                        <button onclick="checkAnswer('input${taskNum}', 'card${taskNum}', 'feedback${taskNum}', ${answersJson})">Sprawdź</button>
+                        <button onclick="checkAnswer('input${taskNum}', 'card${taskNum}', 'feedback${taskNum}', ${answersJson}, 'btn-answer${taskNum}')">Sprawdź</button>
                         <button class="btn-hint" onclick="toggleHint('hint${taskNum}')">Podpowiedź</button>
+                        
+                        <button class="btn-answer" id="btn-answer${taskNum}" style="display: none;" onclick="showAnswer('input${taskNum}', '${firstAnswer}', 'card${taskNum}', 'feedback${taskNum}', 'btn-answer${taskNum}')">Odpowiedź</button>
+                        
                         <span id="feedback${taskNum}" class="feedback"></span>
                     </div>
                     <div id="hint${taskNum}" class="hint-text">
@@ -290,10 +303,12 @@
             }
         }
 
-        function checkAnswer(inputId, cardId, feedbackId, correctAnswers) {
+        // Обновленная функция проверки с учетом попыток
+        function checkAnswer(inputId, cardId, feedbackId, correctAnswers, btnAnswerId) {
             let userInput = document.getElementById(inputId).value;
             let feedbackElement = document.getElementById(feedbackId);
             let cardElement = document.getElementById(cardId);
+            let btnAnswer = document.getElementById(btnAnswerId);
             
             cardElement.classList.remove("correct-bg", "incorrect-bg");
 
@@ -307,6 +322,11 @@
                 return;
             }
 
+            // Инициализируем счетчик для этого поля, если его еще нет
+            if (attemptCounts[inputId] === undefined) {
+                attemptCounts[inputId] = 0;
+            }
+
             let isCorrect = correctAnswers.some(answer => 
                 answer.toLowerCase() === normalizedInput || 
                 answer.toLowerCase() === inputWithDot ||
@@ -317,11 +337,39 @@
                 feedbackElement.textContent = "Dobrze!";
                 feedbackElement.className = "feedback correct";
                 cardElement.classList.add("correct-bg");
+                btnAnswer.style.display = "none"; // Прячем кнопку ответа, если решили сами
             } else {
+                attemptCounts[inputId]++; // Увеличиваем счетчик ошибок
+                
                 feedbackElement.textContent = "Spróbuj jeszcze raz.";
                 feedbackElement.className = "feedback incorrect";
                 cardElement.classList.add("incorrect-bg");
+                
+                // Если ошибок 2 или больше - показываем кнопку "Odpowiedź"
+                if (attemptCounts[inputId] >= 2) {
+                    btnAnswer.style.display = "inline-block";
+                }
             }
+        }
+
+        // Новая функция для показа правильного ответа
+        function showAnswer(inputId, correctAnswer, cardId, feedbackId, btnAnswerId) {
+            let inputElement = document.getElementById(inputId);
+            let cardElement = document.getElementById(cardId);
+            let feedbackElement = document.getElementById(feedbackId);
+            let btnAnswer = document.getElementById(btnAnswerId);
+            
+            // Вписываем правильный ответ
+            inputElement.value = correctAnswer;
+            
+            // Делаем карточку зеленой
+            cardElement.classList.remove("incorrect-bg");
+            cardElement.classList.add("correct-bg");
+            
+            // Хвалим и прячем кнопку ответа
+            feedbackElement.innerHTML = "Oto prawidłowa odpowiedź!";
+            feedbackElement.className = "feedback correct";
+            btnAnswer.style.display = "none";
         }
     </script>
 </body>
