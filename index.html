@@ -7,7 +7,7 @@
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-image: url('background2.jpg');
+            background-image: url('background.jpg');
             background-size: cover; 
             background-position: center;
             background-attachment: fixed; 
@@ -72,6 +72,15 @@
             border-radius: 8px;
             display: block;
         }
+        .visual-desc {
+            background-color: #f8f9fa;
+            border: 1px dashed #adb5bd;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 5px;
+            font-family: monospace;
+            display: inline-block;
+        }
         .input-group {
             display: flex;
             align-items: center;
@@ -127,7 +136,7 @@
 
     <div class="header-container">
         <h1>Do czego służą równania</h1>
-        <p class="description">Zapisz podane sytuacje w postaci równań. Używaj małych liter (np. x, y). Не забудьте загрузить фоновое изображение (background.jpg) и иллюстрацию весов (weight_scale.png и weight_scale2.png) и изображение отрезков (segments_visualization.png) в ту же папку на GitHub!</p>
+        <p class="description">Zapisz podane sytuacje w postaci równań. Używaj małych liter (np. x, y). Nie musisz ich jeszcze rozwiązywać!</p>
     </div>
 
     <div id="tasks-container">
@@ -177,14 +186,13 @@
                 answers: ["x+1=5", "1+x=5", "x+1kg=5kg"]
             },
             {
-                // ИСПРАВЛЕННОЕ ЗАДАНИЕ С ИЛЛЮСТРАЦИЕЙ ОТРЕЗКОВ ДЛЯ 9
-                text: "Zapisz równanie na podstawie ilustracji (Zadanie 9):<br><img src='segments_visualization.png' alt='Odcinek podział' class='task-image'>",
-                hint: "Pamiętaj: pierwsza część dodać druga część równa się całości.",
+                text: "Odcinek o długości 30 został podzielony na dwie części. Jedna ma długość 3, a druga x.<br><span class='visual-desc'>|--- 3 ---|--------- x ---------| (całość to 30)</span>",
+                hint: "Suma obu części odcinka daje nam całość, czyli 30.",
                 answers: ["3+x=30", "x+3=30", "30-x=3"]
             },
             {
                 text: "Trójkąt prostokątny ma obwód równy 70 cm. Długości jego boków to: k, (k + 1) oraz (k + 9).",
-                hint: "Obwód to suma wszystkich boków. Dodaj je wszystkie do siebie i приравняй к 70.",
+                hint: "Obwód to suma wszystkich boków. Dodaj je wszystkie do siebie i przyrównaj do 70.",
                 answers: ["k+k+1+k+9=70", "k+(k+1)+(k+9)=70", "3k+10=70"]
             },
             {
@@ -199,7 +207,7 @@
             },
             {
                 text: "Liczba 13 jest o 10% większa od liczby u.",
-                hint: "Do liczby u (100%) musisz dodaть ее 10%, co daje нам 110% (1,1u).",
+                hint: "Do liczby u (100%) musisz dodać jej 10%, co daje nam 110% (1,1u).",
                 answers: ["u+0.1u=13", "1.1u=13", "u+10%u=13", "1,1u=13"]
             },
             {
@@ -214,18 +222,26 @@
             },
             {
                 text: "Trójkąt prostokątny ma boki: k, (k + 3) oraz (k + 6). Jego obwód wynosi 36 cm.",
-                hint: "Dodaj wszystkie trzy boki и приравняй к 36.",
+                hint: "Dodaj wszystkie trzy boki i przyrównaj je do 36.",
                 answers: ["k+k+3+k+6=36", "k+(k+3)+(k+6)=36", "3k+9=36"]
             },
             {
                 text: "Waga pozostaje w równowadze. Zapisz równanie na podstawie ilustracji:<br><img src='weight_scale2.png' alt='Ilustracja wagi 17' class='task-image'>",
-                hint: "Zlicz odważniki. Lewa szalka (x + 1) musi równać się prawej szalce (4 odważniki po 1 kg).",
-                answers: ["x+1=4", "1+x=4"]
+                hint: "Zlicz odważniki i klocki. Lewa szalka (x i trzy odważniki po 1 kg) musi równać się prawej szalce (dwa klocki x i jeden odważnik 1 kg).",
+                answers: [
+                    "x+3=2x+1", 
+                    "2x+1=x+3", 
+                    "x+1+1+1=x+x+1", 
+                    "x+x+1=x+1+1+1", 
+                    "3+x=2x+1", 
+                    "2x+1=3+x",
+                    "x+1+1+1=2x+1",
+                    "2x+1=x+1+1+1"
+                ]
             },
             {
-                // ИСПРАВЛЕННОЕ ЗАДАНИЕ С ИЛЛЮСТРАЦИЕЙ ОТРЕЗКОВ ДЛЯ 18
-                text: "Zapisz równние na podstawie ilustracji (Zadanie 18):<br><img src='segments_visualization.png' alt='Odcinek podział x i 8' class='task-image'>",
-                hint: "Zadanie 18: pierwsza część (x) dodaть вторая część (8) дает całe 80.",
+                text: "Odcinek długości 80 podzielono na dwie części. Jedna ma długość x, a druga 8.<br><span class='visual-desc'>|--------- x ---------|--- 8 ---| (całość to 80)</span>",
+                hint: "Część x dodać część 8 daje całe 80.",
                 answers: ["x+8=80", "8+x=80", "80-x=8"]
             },
             {
@@ -242,7 +258,6 @@
 
         const container = document.getElementById("tasks-container");
 
-        // Automatyczna generacja HTML
         tasksData.forEach((task, index) => {
             const taskNum = index + 1;
             const answersJson = JSON.stringify(task.answers).replace(/"/g, "'");
