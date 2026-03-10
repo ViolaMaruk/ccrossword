@@ -7,36 +7,46 @@
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f6;
+            /* Красивый фон "в точечку" (эффект тетради) */
+            background-color: #fdfbfb;
+            background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px);
+            background-size: 25px 25px;
             color: #333;
             line-height: 1.6;
             padding: 20px;
-            max-width: 800px;
+            max-width: 850px;
             margin: 0 auto;
+        }
+        .header-container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
         }
         h1 {
             text-align: center;
             color: #2c3e50;
             border-bottom: 2px solid #3498db;
             padding-bottom: 10px;
-            margin-bottom: 30px;
+            margin-top: 0;
+            margin-bottom: 15px;
         }
         .description {
             text-align: center;
             font-size: 1.1em;
-            margin-bottom: 30px;
             color: #555;
+            margin: 0;
         }
         .task-card {
             background: #fff;
             padding: 20px 25px;
             margin-bottom: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            border-left: 5px solid #3498db;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            border-left: 6px solid #3498db;
             transition: background-color 0.4s, border-color 0.4s;
         }
-        /* Классы для правильного и неправильного ответа */
         .task-card.correct-bg {
             background-color: #d4edda;
             border-left-color: #28a745;
@@ -49,6 +59,15 @@
             font-size: 1.1em;
             margin-bottom: 15px;
         }
+        .visual-desc {
+            background-color: #f8f9fa;
+            border: 1px dashed #adb5bd;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 5px;
+            font-family: monospace;
+            display: inline-block;
+        }
         .input-group {
             display: flex;
             align-items: center;
@@ -58,12 +77,15 @@
         input[type="text"] {
             padding: 10px;
             font-size: 1em;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
             flex-grow: 1;
             max-width: 300px;
             outline: none;
             transition: border-color 0.3s;
+        }
+        input[type="text"]:focus {
+            border-color: #3498db;
         }
         button {
             background-color: #3498db;
@@ -71,110 +93,173 @@
             border: none;
             padding: 10px 20px;
             font-size: 1em;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s, transform 0.1s;
         }
-        button:hover {
-            background-color: #2980b9;
-        }
-        /* Кнопка подсказки */
-        button.btn-hint {
-            background-color: #f39c12;
-        }
-        button.btn-hint:hover {
-            background-color: #d68910;
-        }
+        button:hover { background-color: #2980b9; }
+        button:active { transform: scale(0.97); }
+        button.btn-hint { background-color: #f39c12; }
+        button.btn-hint:hover { background-color: #d68910; }
         .feedback {
             font-weight: bold;
             margin-left: 10px;
         }
         .correct { color: #1e8449; }
         .incorrect { color: #c0392b; }
-        
-        /* Блок с текстом подсказки (скрыт по умолчанию) */
         .hint-text {
             display: none;
             margin-top: 15px;
-            padding: 10px;
-            background-color: #fdf2e9;
-            border-left: 4px solid #e67e22;
+            padding: 12px;
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
             font-style: italic;
-            color: #d35400;
-            border-radius: 0 4px 4px 0;
+            color: #856404;
+            border-radius: 0 6px 6px 0;
         }
     </style>
 </head>
 <body>
 
-    <h1>Do czego służą równania</h1>
-    <p class="description">Zapisz podane sytuacje w postaci równań. Używaj małych liter (np. x, y).</p>
-
-    <div class="task-card" id="card1">
-        <div class="task-text">
-            <strong>1.</strong> Zapisz podane zdanie w postaci równania:<br>
-            <em>Jeżeli liczbę x powiększymy o 15, to otrzymamy 42.</em>
-        </div>
-        <div class="input-group">
-            <input type="text" id="input1" placeholder="Wpisz równanie...">
-            <button onclick="checkAnswer('input1', 'card1', 'feedback1', ['x+15=42', '15+x=42'])">Sprawdź</button>
-            <button class="btn-hint" onclick="toggleHint('hint1')">Podpowiedź</button>
-            <span id="feedback1" class="feedback"></span>
-        </div>
-        <div id="hint1" class="hint-text">
-            Słowo "powiększymy o" oznacza w matematyce dodawanie (+). Słowo "otrzymamy" to znak równości (=).
-        </div>
+    <div class="header-container">
+        <h1>Do czego służą równania</h1>
+        <p class="description">Zapisz podane sytuacje w postaci równań. Używaj małych liter (np. x, y). Nie musisz ich jeszcze rozwiązywać!</p>
     </div>
 
-    <div class="task-card" id="card2">
-        <div class="task-text">
-            <strong>2.</strong> Zapisz sytuację za pomocą równania:<br>
-            <em>Za książkę i zakładkę Tomek zapłacił 45 zł. Książka była 4 razy droższa od zakładki. Oznacz cenę zakładki literą x.</em>
+    <div id="tasks-container">
         </div>
-        <div class="input-group">
-            <input type="text" id="input2" placeholder="Wpisz równanie...">
-            <button onclick="checkAnswer('input2', 'card2', 'feedback2', ['x+4x=45', '4x+x=45', '5x=45'])">Sprawdź</button>
-            <button class="btn-hint" onclick="toggleHint('hint2')">Podpowiedź</button>
-            <span id="feedback2" class="feedback"></span>
-        </div>
-        <div id="hint2" class="hint-text">
-            Jeśli zakładka kosztuje "x", to 4 razy droższa książka kosztuje "4x". Dodaj te dwie wartości do siebie.
-        </div>
-    </div>
-
-    <div class="task-card" id="card3">
-        <div class="task-text">
-            <strong>3.</strong> Zapisz zdanie w postaci równania:<br>
-            <em>Liczba o 20% mniejsza od y jest równa 64.</em>
-        </div>
-        <div class="input-group">
-            <input type="text" id="input3" placeholder="Wpisz równanie...">
-            <button onclick="checkAnswer('input3', 'card3', 'feedback3', ['y-0.2y=64', '0.8y=64', 'y-20%y=64'])">Sprawdź</button>
-            <button class="btn-hint" onclick="toggleHint('hint3')">Podpowiedź</button>
-            <span id="feedback3" class="feedback"></span>
-        </div>
-        <div id="hint3" class="hint-text">
-            Cała liczba y to 100%. Jeśli zabierzemy z niej 20%, zostanie nam 80% tej liczby (co zapisujemy jako 0,8y).
-        </div>
-    </div>
-    
-    <div class="task-card" id="card4">
-        <div class="task-text">
-            <strong>4.</strong> Zapisz poniższy tekst za pomocą równania:<br>
-            <em>Marek rozwiązał x zadań, a Sylwia o 5 zadań więcej. Razem rozwiązali 25 zadań.</em>
-        </div>
-        <div class="input-group">
-            <input type="text" id="input4" placeholder="Wpisz równanie...">
-            <button onclick="checkAnswer('input4', 'card4', 'feedback4', ['x+x+5=25', '2x+5=25', 'x+(x+5)=25'])">Sprawdź</button>
-            <button class="btn-hint" onclick="toggleHint('hint4')">Podpowiedź</button>
-            <span id="feedback4" class="feedback"></span>
-        </div>
-        <div id="hint4" class="hint-text">
-            Zapisz ilość zadań Sylwii jako (x + 5). Aby dowiedzieć się, ile zrobili razem, dodaj zadania Marka i zadania Sylwii.
-        </div>
-    </div>
 
     <script>
+        // BAZA ZADAŃ (Tutaj możesz łatwo dodawać nowe!)
+        const tasksData = [
+            {
+                text: "Jeżeli liczbę x powiększymy o 12, to otrzymamy 41.",
+                hint: "Słowo 'powiększymy o' oznacza w matematyce dodawanie (+).",
+                answers: ["x+12=41", "12+x=41"]
+            },
+            {
+                text: "Liczba 27 jest 2 razy większa od x.",
+                hint: "Zapisz '2 razy większa od x' jako 2x.",
+                answers: ["2x=27", "2*x=27", "27=2x", "27=2*x"]
+            },
+            {
+                text: "Liczba 2 razy mniejsza od y jest równa 35.",
+                hint: "Dwa razy mniejsza to inaczej dzielenie przez 2 lub ułamek 0,5.",
+                answers: ["y/2=35", "0.5y=35", "y:2=35", "1/2y=35", "0,5y=35"]
+            },
+            {
+                text: "Liczba 21 jest o 8 większa od z.",
+                hint: "Do liczby z musisz dodać 8, aby otrzymać 21.",
+                answers: ["z+8=21", "8+z=21", "21-8=z"]
+            },
+            {
+                text: "Liczba 47 jest o 16 mniejsza od t.",
+                hint: "Od liczby t musisz odjąć 16, aby otrzymać 47.",
+                answers: ["t-16=47", "47+16=t", "47=t-16"]
+            },
+            {
+                text: "Za długopis i ołówek Magda zapłaciła 4,20 zł. Długopis był dwa razy droższy od ołówka. Oznacz cenę ołówka literą x.",
+                hint: "Ołówek to x, długopis to 2x. Dodaj je do siebie.",
+                answers: ["x+2x=4.20", "2x+x=4.20", "3x=4.20"]
+            },
+            {
+                text: "Suma dwóch liczb, z których jedna jest 5,2 razy większa od drugiej, wynosi 23,48. (Mniejsza liczba to x)",
+                hint: "Jedna liczba to x, a druga to 5,2x.",
+                answers: ["x+5.2x=23.48", "5.2x+x=23.48", "6.2x=23.48"]
+            },
+            {
+                text: "Waga pozostaje w równowadze.<br><span class='visual-desc'>⚖️ Lewa szalka: [x kg] i [1 kg] | Prawa szalka: [1 kg][1 kg][1 kg][1 kg][1 kg]</span>",
+                hint: "Na lewej stronie masz x + 1, a na prawej masz 5 odważników jednokilogramowych.",
+                answers: ["x+1=5", "1+x=5"]
+            },
+            {
+                text: "Odcinek o długości 30 został podzielony na dwie części. Jedna ma długość 3, a druga x.<br><span class='visual-desc'>|--- 3 ---|--------- x ---------| (całość to 30)</span>",
+                hint: "Suma obu części odcinka daje nam całość, czyli 30.",
+                answers: ["3+x=30", "x+3=30"]
+            },
+            {
+                text: "Trójkąt prostokątny ma obwód równy 70 cm. Długości jego boków to: k, (k + 1) oraz (k + 9).",
+                hint: "Obwód to suma wszystkich boków. Dodaj je wszystkie do siebie i przyrównaj do 70.",
+                answers: ["k+k+1+k+9=70", "k+(k+1)+(k+9)=70", "3k+10=70"]
+            },
+            {
+                text: "Liczba o 5 mniejsza od x stanowi 80% liczby x.",
+                hint: "Liczba o 5 mniejsza to (x - 5). Pamiętaj, że 80% zapisujemy ułamkiem dziesiętnym jako 0,8.",
+                answers: ["x-5=0.8x", "x-5=80%x"]
+            },
+            {
+                text: "Liczba o 15% mniejsza od liczby x jest równa 17.",
+                hint: "Cała liczba to 100%. Jeśli odejmiemy 15%, zostanie 85% z iksa (czyli 0,85x).",
+                answers: ["x-0.15x=17", "0.85x=17", "x-15%x=17"]
+            },
+            {
+                text: "Liczba 13 jest o 10% większa od liczby u.",
+                hint: "Do liczby u (100%) musisz dodać jej 10%, co daje nam 110% (1,1u).",
+                answers: ["u+0.1u=13", "1.1u=13", "u+10%u=13"]
+            },
+            {
+                text: "Marek rozwiązał x zadań, a Sylwia o 5% więcej. Razem rozwiązali 82 zadania.",
+                hint: "Marek to x. Sylwia to x + 0,05x (lub po prostu 1,05x). Razem to suma ich zadań.",
+                answers: ["x+x+0.05x=82", "x+1.05x=82", "2.05x=82", "x+(x+0.05x)=82"]
+            },
+            {
+                text: "Za korektor i kątomierz Ola zapłaciła 3,50 zł. Korektor był cztery razy droższy od kątomierza. Jeśli x to cena kątomierza, to:",
+                hint: "Kątomierz = x, Korektor = 4x.",
+                answers: ["x+4x=3.50", "4x+x=3.50", "5x=3.50", "x+4x=3.5"]
+            },
+            {
+                text: "Trójkąt prostokątny ma boki: k, (k + 3) oraz (k + 6). Jego obwód wynosi 36 cm.",
+                hint: "Dodaj wszystkie trzy boki i przyrównaj je do 36.",
+                answers: ["k+k+3+k+6=36", "k+(k+3)+(k+6)=36", "3k+9=36"]
+            },
+            {
+                text: "Waga jest w równowadze.<br><span class='visual-desc'>⚖️ Lewa szalka: [x kg][1 kg] | Prawa szalka: [1 kg][1 kg][1 kg][1 kg]</span>",
+                hint: "Zlicz odważniki po prawej stronie.",
+                answers: ["x+1=4", "1+x=4"]
+            },
+            {
+                text: "Odcinek długości 80 podzielono na dwie części.<br><span class='visual-desc'>|--------- x ---------|--- 8 ---| (całość to 80)</span>",
+                hint: "Część x dodać część 8 daje całe 80.",
+                answers: ["x+8=80", "8+x=80"]
+            },
+            {
+                text: "Suma dwóch liczb, z których jedna jest 7,23 razy większa od drugiej, wynosi 32,92. (Mniejsza to x).",
+                hint: "Druga liczba to 7,23x.",
+                answers: ["x+7.23x=32.92", "7.23x+x=32.92", "8.23x=32.92"]
+            },
+            {
+                text: "Marek rozwiązał x zadań, a Sylwia o 45% więcej. Razem rozwiązali 49 zadań.",
+                hint: "Sylwia zrobiła 145% zadań Marka, czyli 1,45x.",
+                answers: ["x+x+0.45x=49", "x+1.45x=49", "2.45x=49", "x+(x+0.45x)=49"]
+            }
+        ];
+
+        const container = document.getElementById("tasks-container");
+
+        // Automatyczne generowanie HTML dla wszystkich zadań
+        tasksData.forEach((task, index) => {
+            const taskNum = index + 1;
+            const answersJson = JSON.stringify(task.answers).replace(/"/g, "'");
+
+            const taskHTML = `
+                <div class="task-card" id="card${taskNum}">
+                    <div class="task-text">
+                        <strong>${taskNum}.</strong> ${task.text}
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="input${taskNum}" placeholder="Wpisz równanie...">
+                        <button onclick="checkAnswer('input${taskNum}', 'card${taskNum}', 'feedback${taskNum}', ${answersJson})">Sprawdź</button>
+                        <button class="btn-hint" onclick="toggleHint('hint${taskNum}')">Podpowiedź</button>
+                        <span id="feedback${taskNum}" class="feedback"></span>
+                    </div>
+                    <div id="hint${taskNum}" class="hint-text">
+                        ${task.hint}
+                    </div>
+                </div>
+            `;
+            container.innerHTML += taskHTML;
+        });
+
         // Funkcja pokazywania/ukrywania podpowiedzi
         function toggleHint(hintId) {
             let hintElement = document.getElementById(hintId);
@@ -185,15 +270,15 @@
             }
         }
 
-        // Zaktualizowana funkcja sprawdzania odpowiedzi
+        // Funkcja sprawdzania odpowiedzi
         function checkAnswer(inputId, cardId, feedbackId, correctAnswers) {
             let userInput = document.getElementById(inputId).value;
             let feedbackElement = document.getElementById(feedbackId);
             let cardElement = document.getElementById(cardId);
             
-            // Resetujemy kolory tła przed każdym sprawdzeniem
             cardElement.classList.remove("correct-bg", "incorrect-bg");
 
+            // Oczyszczanie wpisu: usuwamy spacje, zamieniamy przecinki na kropki
             let normalizedInput = userInput.replace(/\s+/g, '').toLowerCase();
             normalizedInput = normalizedInput.replace(',', '.');
 
@@ -208,12 +293,10 @@
             if (isCorrect) {
                 feedbackElement.textContent = "Dobrze!";
                 feedbackElement.className = "feedback correct";
-                // Dodajemy zielone tło
                 cardElement.classList.add("correct-bg");
             } else {
                 feedbackElement.textContent = "Spróbuj jeszcze raz.";
                 feedbackElement.className = "feedback incorrect";
-                // Dodajemy czerwone tło
                 cardElement.classList.add("incorrect-bg");
             }
         }
