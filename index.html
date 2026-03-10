@@ -116,7 +116,7 @@
         button.btn-hint { background-color: #f39c12; }
         button.btn-hint:hover { background-color: #d68910; }
         
-        /* Стиль для новой кнопки ответа */
+        /* Стиль для кнопки ответа */
         button.btn-answer { background-color: #9b59b6; }
         button.btn-answer:hover { background-color: #8e44ad; }
 
@@ -264,13 +264,13 @@
 
         const container = document.getElementById("tasks-container");
         
-        // Объект для хранения количества неправильных попыток для каждого задания
-        let attemptCounts = {};
+        // Объект для хранения УНИКАЛЬНЫХ неправильных ответов (используем Set)
+        let userAttempts = {};
 
         tasksData.forEach((task, index) => {
             const taskNum = index + 1;
             const answersJson = JSON.stringify(task.answers).replace(/"/g, "'");
-            const firstAnswer = task.answers[0]; // Берем первый вариант ответа для кнопки-шпаргалки
+            const firstAnswer = task.answers[0]; // Берем первый вариант ответа для шпаргалки
 
             const taskHTML = `
                 <div class="task-card" id="card${taskNum}">
@@ -303,7 +303,7 @@
             }
         }
 
-        // Обновленная функция проверки с учетом попыток
+        // Улучшенная функция проверки с учетом уникальных попыток
         function checkAnswer(inputId, cardId, feedbackId, correctAnswers, btnAnswerId) {
             let userInput = document.getElementById(inputId).value;
             let feedbackElement = document.getElementById(feedbackId);
@@ -322,9 +322,9 @@
                 return;
             }
 
-            // Инициализируем счетчик для этого поля, если его еще нет
-            if (attemptCounts[inputId] === undefined) {
-                attemptCounts[inputId] = 0;
+            // Создаем множество для этого поля, если его еще нет
+            if (userAttempts[inputId] === undefined) {
+                userAttempts[inputId] = new Set();
             }
 
             let isCorrect = correctAnswers.some(answer => 
@@ -337,22 +337,28 @@
                 feedbackElement.textContent = "Dobrze!";
                 feedbackElement.className = "feedback correct";
                 cardElement.classList.add("correct-bg");
-                btnAnswer.style.display = "none"; // Прячем кнопку ответа, если решили сами
+                btnAnswer.style.display = "none"; 
             } else {
-                attemptCounts[inputId]++; // Увеличиваем счетчик ошибок
-                
-                feedbackElement.textContent = "Spróbuj jeszcze raz.";
+                // Если ответ неверный, проверяем, вводил ли ученик его раньше
+                if (userAttempts[inputId].has(normalizedInput)) {
+                    feedbackElement.textContent = "Już podałeś taką odpowiedź. Spróbuj inną!";
+                } else {
+                    // Если это новый неправильный ответ, добавляем его в память
+                    userAttempts[inputId].add(normalizedInput);
+                    feedbackElement.textContent = "Spróbuj jeszcze raz.";
+                }
+
                 feedbackElement.className = "feedback incorrect";
                 cardElement.classList.add("incorrect-bg");
                 
-                // Если ошибок 2 или больше - показываем кнопку "Odpowiedź"
-                if (attemptCounts[inputId] >= 2) {
+                // Если накопилось 2 ИЛИ БОЛЕЕ РАЗНЫХ неправильных ответов — показываем кнопку
+                if (userAttempts[inputId].size >= 2) {
                     btnAnswer.style.display = "inline-block";
                 }
             }
         }
 
-        // Новая функция для показа правильного ответа
+        // Функция для показа правильного ответа
         function showAnswer(inputId, correctAnswer, cardId, feedbackId, btnAnswerId) {
             let inputElement = document.getElementById(inputId);
             let cardElement = document.getElementById(cardId);
