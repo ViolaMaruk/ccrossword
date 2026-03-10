@@ -12,7 +12,6 @@
             background-position: center;
             background-attachment: fixed; 
             background-repeat: no-repeat;
-            
             color: #333;
             line-height: 1.6;
             padding: 20px;
@@ -27,355 +26,281 @@
             margin-bottom: 30px;
         }
         h1 {
-            text-align: center;
-            color: #2c3e50;
-            border-bottom: 2px solid #3498db;
-            padding-bottom: 10px;
-            margin-top: 0;
-            margin-bottom: 15px;
+            text-align: center; color: #2c3e50; border-bottom: 2px solid #3498db;
+            padding-bottom: 10px; margin-top: 0; margin-bottom: 15px;
         }
-        .description {
-            text-align: center;
-            font-size: 1.1em;
-            color: #555;
-            margin: 0;
-        }
+        .description { text-align: center; font-size: 1.1em; color: #555; margin: 0; }
+        
         .task-card {
-            background: #fff;
-            padding: 20px 25px;
-            margin-bottom: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            border-left: 6px solid #3498db;
-            transition: background-color 0.4s, border-color 0.4s, transform 0.2s;
+            background: #fff; padding: 20px 25px; margin-bottom: 20px;
+            border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            border-left: 6px solid #3498db; transition: all 0.3s;
         }
-        .task-card:hover {
-            transform: translateY(-2px);
-        }
-        .task-card.correct-bg {
-            background-color: #d4edda;
-            border-left-color: #28a745;
-        }
-        .task-card.incorrect-bg {
-            background-color: #f8d7da;
-            border-left-color: #dc3545;
-        }
-        .task-text {
-            font-size: 1.1em;
-            margin-bottom: 15px;
-        }
-        .task-image {
-            max-width: 100%;
-            height: auto;
-            margin-top: 10px;
-            margin-bottom: 15px;
-            border-radius: 8px;
-            display: block;
-        }
-        .visual-desc {
-            background-color: #f8f9fa;
-            border: 1px dashed #adb5bd;
-            padding: 10px;
-            border-radius: 6px;
-            margin-top: 5px;
-            font-family: monospace;
-            display: inline-block;
-        }
-        .input-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
+        .task-card.correct-bg { background-color: #d4edda; border-left-color: #28a745; }
+        .task-card.incorrect-bg { background-color: #f8d7da; border-left-color: #dc3545; }
+        .task-text { font-size: 1.1em; margin-bottom: 15px; }
+        .task-image { max-width: 100%; height: auto; margin-top: 10px; margin-bottom: 15px; border-radius: 8px; display: block; }
+        
+        .input-group { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
         input[type="text"] {
-            padding: 10px;
-            font-size: 1em;
-            border: 2px solid #e2e8f0;
-            border-radius: 6px;
-            flex-grow: 1;
-            max-width: 300px;
-            outline: none;
-            transition: border-color 0.3s;
+            padding: 10px; font-size: 1em; border: 2px solid #e2e8f0;
+            border-radius: 6px; flex-grow: 1; max-width: 300px; outline: none;
         }
-        input[type="text"]:focus {
-            border-color: #3498db;
-        }
+        input[type="text"]:focus { border-color: #3498db; }
+        
         button {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 1em;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.1s;
+            background-color: #3498db; color: white; border: none; padding: 10px 20px;
+            font-size: 1em; border-radius: 6px; cursor: pointer; transition: 0.2s;
         }
         button:hover { background-color: #2980b9; }
-        button:active { transform: scale(0.97); }
-        
         button.btn-hint { background-color: #f39c12; }
         button.btn-hint:hover { background-color: #d68910; }
-        
-        /* Стиль для кнопки ответа */
         button.btn-answer { background-color: #9b59b6; }
         button.btn-answer:hover { background-color: #8e44ad; }
-
-        .feedback {
-            font-weight: bold;
-            margin-left: 10px;
-        }
+        
+        .feedback { font-weight: bold; margin-left: 10px; }
         .correct { color: #1e8449; }
         .incorrect { color: #c0392b; }
-        .hint-text {
-            display: none;
-            margin-top: 15px;
-            padding: 12px;
-            background-color: #fff3cd;
-            border-left: 4px solid #ffc107;
-            font-style: italic;
-            color: #856404;
-            border-radius: 0 6px 6px 0;
+        .hint-text { display: none; margin-top: 15px; padding: 12px; background-color: #fff3cd; border-left: 4px solid #ffc107; font-style: italic; color: #856404; border-radius: 0 6px 6px 0; }
+
+        /* СТИЛИ ДЛЯ СТАРТОВОГО ОКНА И КНОПКИ ОТПРАВКИ */
+        #start-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); display: flex; justify-content: center;
+            align-items: center; z-index: 1000;
         }
+        .modal-content {
+            background: white; padding: 40px; border-radius: 12px; text-align: center;
+            max-width: 400px; width: 90%; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .modal-content input {
+            width: 100%; margin-bottom: 15px; padding: 10px; box-sizing: border-box; text-align: center;
+            font-size: 1.1em; border: 2px solid #e2e8f0; border-radius: 6px;
+        }
+        .modal-content button { width: 100%; font-size: 1.1em; padding: 12px; background-color: #27ae60;}
+        .modal-content button:hover { background-color: #2ecc71;}
+        
+        #app-content { display: none; }
+        
+        .finish-container {
+            text-align: center; background: rgba(255,255,255,0.95); padding: 30px;
+            border-radius: 12px; margin-top: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .btn-finish { background-color: #e74c3c; font-size: 1.2em; padding: 15px 30px; }
+        .btn-finish:hover { background-color: #c0392b; }
     </style>
 </head>
 <body>
 
-    <div class="header-container">
-        <h1>Do czego służą równania</h1>
-        <p class="description">Zapisz podane sytuacje w postaci równań. Używaj małych liter (np. x, y). Nie musisz ich jeszcze rozwiązywać!</p>
+    <div id="start-modal">
+        <div class="modal-content">
+            <h2>Witaj! 👋</h2>
+            <p>Przed rozpoczęciem testu wpisz swoje dane:</p>
+            <input type="text" id="student-name" placeholder="Imię i nazwisko" required>
+            <input type="text" id="student-class" placeholder="Klasa (np. 6A)" required>
+            <button onclick="startTest()">Rozpocznij test</button>
+            <p id="modal-error" style="color: red; font-size: 0.9em; display: none;">Proszę wypełnić wszystkie pola!</p>
+        </div>
     </div>
 
-    <div id="tasks-container">
+    <div id="app-content">
+        <div class="header-container">
+            <h1>Do czego służą równania</h1>
+            <p class="description">Zapisz podane sytuacje w postaci równań. Używaj małych liter (np. x, y). Nie musisz ich jeszcze rozwiązywać!</p>
         </div>
 
+        <div id="tasks-container"></div>
+
+        <div class="finish-container">
+            <h2 id="finish-text">Skończyłeś? Wyślij wyniki do nauczyciela!</h2>
+            <button class="btn-finish" id="btn-submit" onclick="sendResults()">Wyślij wyniki 📧</button>
+        </div>
+    </div>
+
     <script>
-        // БАЗА ЗАДАНИЙ
-        const tasksData = [
-            {
-                text: "Jeżeli liczbę x powiększymy o 12, to otrzymamy 41.",
-                hint: "Słowo 'powiększymy o' oznacza w matematyce dodawanie (+).",
-                answers: ["x+12=41", "12+x=41"]
-            },
-            {
-                text: "Liczba 27 jest 2 razy większa od x.",
-                hint: "Zapisz '2 razy większa od x' jako 2x.",
-                answers: ["2x=27", "2*x=27", "27=2x", "27=2*x"]
-            },
-            {
-                text: "Liczba 2 razy mniejsza od y jest równa 35.",
-                hint: "Dwa razy mniejsza to inaczej dzielenie przez 2 lub ułamek 0,5.",
-                answers: ["y/2=35", "0.5y=35", "y:2=35", "1/2y=35", "0,5y=35"]
-            },
-            {
-                text: "Liczba 21 jest o 8 większa od z.",
-                hint: "Do liczby z musisz dodać 8, aby otrzymać 21.",
-                answers: ["z+8=21", "8+z=21", "21-8=z"]
-            },
-            {
-                text: "Liczba 47 jest o 16 mniejsza od t.",
-                hint: "Od liczby t musisz odjąć 16, aby otrzymać 47.",
-                answers: ["t-16=47", "47+16=t", "47=t-16"]
-            },
-            {
-                text: "Za długopis i ołówek Magda zapłaciła 4,20 zł. Długopis był dwa razy droższy od ołówka. Oznacz cenę ołówka literą x.",
-                hint: "Ołówek to x, długopis to 2x. Dodaj je do siebie.",
-                answers: ["x+2x=4.20", "2x+x=4.20", "3x=4.20", "x+2x=4,20", "2x+x=4,20", "3x=4,20"]
-            },
-            {
-                text: "Suma dwóch liczb, z których jedna jest 5,2 razy większa od drugiej, wynosi 23,48. (Mniejsza liczba to x)",
-                hint: "Jedna liczba to x, a druga to 5,2x.",
-                answers: ["x+5.2x=23.48", "5.2x+x=23.48", "6.2x=23.48"]
-            },
-            {
-                text: "Waga pozostaje w równowadze. Zapisz równanie na podstawie ilustracji:<br><img src='weight_scale.png' alt='Ilustracja wagi 1' class='task-image'>",
-                hint: "Waga w równowadze oznacza, że lewa strona (=szalka) jest równa prawej stronie.",
-                answers: ["x+1=5", "1+x=5", "x+1kg=5kg"]
-            },
-            {
-                text: "Odcinek o długości 30 został podzielony na dwie części. Jedna ma długość 3, a druga x. Zapisz równanie na podstawie ilustracji:<br><img src='odcinek9.png' alt='Ilustracja odcinka 9' class='task-image'>",
-                hint: "Suma obu części odcinka daje nam całość, czyli 30.",
-                answers: ["3+x=30", "x+3=30", "30-x=3"]
-            },
-            {
-                text: "Trójkąt prostokątny ma obwód równy 70 cm. Długości jego boków to: k, (k + 1) oraz (k + 9).",
-                hint: "Obwód to suma wszystkich boków. Dodaj je wszystkie do siebie i przyrównaj do 70.",
-                answers: ["k+k+1+k+9=70", "k+(k+1)+(k+9)=70", "3k+10=70"]
-            },
-            {
-                text: "Liczba o 5 mniejsza od x stanowi 80% liczby x.",
-                hint: "Liczba o 5 mniejsza to (x - 5). Pamiętaj, że 80% zapisujemy ułamkiem dziesiętnym jako 0,8.",
-                answers: ["x-5=0.8x", "x-5=80%x", "x-5=0,8x"]
-            },
-            {
-                text: "Liczba o 15% mniejsza od liczby x jest równa 17.",
-                hint: "Cała liczba to 100%. Jeśli odejmiemy 15%, zostanie 85% z iksa (czyli 0,85x).",
-                answers: ["x-0.15x=17", "0.85x=17", "x-15%x=17", "0,85x=17"]
-            },
-            {
-                text: "Liczba 13 jest o 10% większa od liczby u.",
-                hint: "Do liczby u (100%) musisz dodać jej 10%, co daje nam 110% (1,1u).",
-                answers: ["u+0.1u=13", "1.1u=13", "u+10%u=13", "1,1u=13"]
-            },
-            {
-                text: "Marek rozwiązał x zadań, a Sylwia o 5% więcej. Razem rozwiązali 82 zadania.",
-                hint: "Marek to x. Sylwia to x + 0,05x (lub po prostu 1,05x). Razem to suma ich zadań.",
-                answers: ["x+x+0.05x=82", "x+1.05x=82", "2.05x=82", "x+(x+0.05x)=82", "2,05x=82"]
-            },
-            {
-                text: "Za korektor i kątomierz Ola zapłaciła 3,50 zł. Korektor był cztery razy droższy od kątomierza. Jeśli x to cena kątomierza, to:",
-                hint: "Kątomierz = x, Korektor = 4x.",
-                answers: ["x+4x=3.50", "4x+x=3.50", "5x=3.50", "x+4x=3.5", "5x=3,5", "5x=3,50"]
-            },
-            {
-                text: "Trójkąt prostokątny ma boki: k, (k + 3) oraz (k + 6). Jego obwód wynosi 36 cm.",
-                hint: "Dodaj wszystkie trzy boki i przyrównaj je do 36.",
-                answers: ["k+k+3+k+6=36", "k+(k+3)+(k+6)=36", "3k+9=36"]
-            },
-            {
-                text: "Waga pozostaje w równowadze. Zapisz równanie na podstawie ilustracji:<br><img src='weight_scale2.png' alt='Ilustracja wagi 17' class='task-image'>",
-                hint: "Zlicz odważniki i klocki. Lewa szalka (x i trzy odważniki po 1 kg) musi równać się prawej szalce (dwa klocki x i jeden odważnik 1 kg).",
-                answers: [
-                    "x+3=2x+1", 
-                    "2x+1=x+3", 
-                    "x+1+1+1=x+x+1", 
-                    "x+x+1=x+1+1+1", 
-                    "3+x=2x+1", 
-                    "2x+1=3+x",
-                    "x+1+1+1=2x+1",
-                    "2x+1=x+1+1+1"
-                ]
-            },
-            {
-                text: "Odcinek długości 80 podzielono na dwie części. Jedna ma długość x, a druga 8. Zapisz równanie na podstawie ilustracji:<br><img src='odcinek18.png' alt='Ilustracja odcinka 18' class='task-image'>",
-                hint: "Część x dodać część 8 daje całe 80.",
-                answers: ["x+8=80", "8+x=80", "80-x=8"]
-            },
-            {
-                text: "Suma dwóch liczb, z których jedna jest 7,23 razy większa od drugiej, wynosi 32,92. (Mniejsza to x).",
-                hint: "Druga liczba to 7,23x.",
-                answers: ["x+7.23x=32.92", "7.23x+x=32.92", "8.23x=32.92", "x+7,23x=32,92", "8,23x=32,92"]
-            },
-            {
-                text: "Marek rozwiązał x zadań, a Sylwia o 45% więcej. Razem rozwiązali 49 zadań.",
-                hint: "Sylwia zrobiła 145% zadań Marka, czyli 1,45x.",
-                answers: ["x+x+0.45x=49", "x+1.45x=49", "2.45x=49", "x+(x+0.45x)=49", "2,45x=49"]
+        // ДАННЫЕ УЧЕНИКА
+        let currentStudent = "";
+        let currentClass = "";
+        let resultsData = {}; 
+        let userAttempts = {};
+
+        function startTest() {
+            const nameInput = document.getElementById("student-name").value.trim();
+            const classInput = document.getElementById("student-class").value.trim();
+            
+            if(nameInput === "" || classInput === "") {
+                document.getElementById("modal-error").style.display = "block";
+                return;
             }
+            
+            currentStudent = nameInput;
+            currentClass = classInput;
+            
+            document.getElementById("start-modal").style.display = "none";
+            document.getElementById("app-content").style.display = "block";
+        }
+
+        // БАЗА ЗАДАНИЙ С КАРТИНКАМИ
+        const tasksData = [
+            { text: "Jeżeli liczbę x powiększymy o 12, to otrzymamy 41.", hint: "Słowo 'powiększymy o' oznacza w matematyce dodawanie (+).", answers: ["x+12=41", "12+x=41"] },
+            { text: "Liczba 27 jest 2 razy większa od x.", hint: "Zapisz '2 razy większa od x' jako 2x.", answers: ["2x=27", "2*x=27", "27=2x", "27=2*x"] },
+            { text: "Liczba 2 razy mniejsza od y jest równa 35.", hint: "Dwa razy mniejsza to inaczej dzielenie przez 2 lub ułamek 0,5.", answers: ["y/2=35", "0.5y=35", "y:2=35", "1/2y=35", "0,5y=35"] },
+            { text: "Liczba 21 jest o 8 większa od z.", hint: "Do liczby z musisz dodać 8, aby otrzymać 21.", answers: ["z+8=21", "8+z=21", "21-8=z"] },
+            { text: "Liczba 47 jest o 16 mniejsza od t.", hint: "Od liczby t musisz odjąć 16, aby otrzymać 47.", answers: ["t-16=47", "47+16=t", "47=t-16"] },
+            { text: "Za długopis i ołówek Magda zapłaciła 4,20 zł. Długopis był dwa razy droższy od ołówka. Oznacz cenę ołówka literą x.", hint: "Ołówek to x, długopis to 2x. Dodaj je do siebie.", answers: ["x+2x=4.20", "2x+x=4.20", "3x=4.20", "x+2x=4,20", "2x+x=4,20", "3x=4,20"] },
+            { text: "Suma dwóch liczb, z których jedna jest 5,2 razy większa od drugiej, wynosi 23,48. (Mniejsza liczba to x)", hint: "Jedna liczba to x, a druga to 5,2x.", answers: ["x+5.2x=23.48", "5.2x+x=23.48", "6.2x=23.48"] },
+            { text: "Waga pozostaje w równowadze. Zapisz równanie na podstawie ilustracji:<br><img src='weight_scale.png' alt='Ilustracja wagi 1' class='task-image'>", hint: "Waga w równowadze oznacza, że lewa strona (=szalka) jest równa prawej stronie.", answers: ["x+1=5", "1+x=5", "x+1kg=5kg"] },
+            { text: "Odcinek o długości 30 został podzielony na dwie części. Jedna ma długość 3, a druga x. Zapisz równanie na podstawie ilustracji:<br><img src='odcinek9.png' alt='Ilustracja odcinka 9' class='task-image'>", hint: "Suma obu części odcinka daje nam całość, czyli 30.", answers: ["3+x=30", "x+3=30", "30-x=3"] },
+            { text: "Trójkąt prostokątny ma obwód równy 70 cm. Długości jego boków to: k, (k + 1) oraz (k + 9).", hint: "Obwód to suma wszystkich boków. Dodaj je wszystkie do siebie i przyrównaj do 70.", answers: ["k+k+1+k+9=70", "k+(k+1)+(k+9)=70", "3k+10=70"] },
+            { text: "Liczba o 5 mniejsza od x stanowi 80% liczby x.", hint: "Liczba o 5 mniejsza to (x - 5). Pamiętaj, że 80% zapisujemy ułamkiem dziesiętnym jako 0,8.", answers: ["x-5=0.8x", "x-5=80%x", "x-5=0,8x"] },
+            { text: "Liczba o 15% mniejsza od liczby x jest równa 17.", hint: "Cała liczba to 100%. Jeśli odejmiemy 15%, zostanie 85% z iksa (czyli 0,85x).", answers: ["x-0.15x=17", "0.85x=17", "x-15%x=17", "0,85x=17"] },
+            { text: "Liczba 13 jest o 10% większa od liczby u.", hint: "Do liczby u (100%) musisz dodać jej 10%, co daje nam 110% (1,1u).", answers: ["u+0.1u=13", "1.1u=13", "u+10%u=13", "1,1u=13"] },
+            { text: "Marek rozwiązał x zadań, a Sylwia o 5% więcej. Razem rozwiązali 82 zadania.", hint: "Marek to x. Sylwia to x + 0,05x (lub po prostu 1,05x). Razem to suma ich zadań.", answers: ["x+x+0.05x=82", "x+1.05x=82", "2.05x=82", "x+(x+0.05x)=82", "2,05x=82"] },
+            { text: "Za korektor i kątomierz Ola zapłaciła 3,50 zł. Korektor był cztery razy droższy od kątomierza. Jeśli x to cena kątomierza, to:", hint: "Kątomierz = x, Korektor = 4x.", answers: ["x+4x=3.50", "4x+x=3.50", "5x=3.50", "x+4x=3.5", "5x=3,5", "5x=3,50"] },
+            { text: "Trójkąt prostokątny ma boki: k, (k + 3) oraz (k + 6). Jego obwód wynosi 36 cm.", hint: "Dodaj wszystkie trzy boki i przyrównaj je do 36.", answers: ["k+k+3+k+6=36", "k+(k+3)+(k+6)=36", "3k+9=36"] },
+            { text: "Waga pozostaje w równowadze. Zapisz równanie na podstawie ilustracji:<br><img src='weight_scale2.png' alt='Ilustracja wagi 17' class='task-image'>", hint: "Zlicz odważniki i klocki. Lewa szalka (x i trzy odważniki po 1 kg) musi równać się prawej szalce (dwa klocki x i jeden odważnik 1 kg).", answers: ["x+3=2x+1", "2x+1=x+3", "x+1+1+1=x+x+1", "x+x+1=x+1+1+1", "3+x=2x+1", "2x+1=3+x", "x+1+1+1=2x+1", "2x+1=x+1+1+1"] },
+            { text: "Odcinek długości 80 podzielono na dwie części. Jedna ma długość x, a druga 8. Zapisz równanie na podstawie ilustracji:<br><img src='odcinek18.png' alt='Ilustracja odcinka 18' class='task-image'>", hint: "Część x dodać część 8 daje całe 80.", answers: ["x+8=80", "8+x=80", "80-x=8"] },
+            { text: "Suma dwóch liczb, z których jedna jest 7,23 razy większa od drugiej, wynosi 32,92. (Mniejsza to x).", hint: "Druga liczba to 7,23x.", answers: ["x+7.23x=32.92", "7.23x+x=32.92", "8.23x=32.92", "x+7,23x=32,92", "8,23x=32,92"] },
+            { text: "Marek rozwiązał x zadań, a Sylwia o 45% więcej. Razem rozwiązali 49 zadań.", hint: "Sylwia zrobiła 145% zadań Marka, czyli 1,45x.", answers: ["x+x+0.45x=49", "x+1.45x=49", "2.45x=49", "x+(x+0.45x)=49", "2,45x=49"] }
         ];
 
         const container = document.getElementById("tasks-container");
-        
-        // Объект для хранения УНИКАЛЬНЫХ неправильных ответов (используем Set)
-        let userAttempts = {};
 
         tasksData.forEach((task, index) => {
             const taskNum = index + 1;
-            const answersJson = JSON.stringify(task.answers).replace(/"/g, "'");
-            const firstAnswer = task.answers[0]; // Берем первый вариант ответа для шпаргалки
+            resultsData[taskNum] = "Nie rozwiązano"; // Начальный статус для отчета
 
-            const taskHTML = `
+            const answersJson = JSON.stringify(task.answers).replace(/"/g, "'");
+            const firstAnswer = task.answers[0];
+
+            container.innerHTML += `
                 <div class="task-card" id="card${taskNum}">
-                    <div class="task-text">
-                        <strong>${taskNum}.</strong> ${task.text}
-                    </div>
+                    <div class="task-text"><strong>${taskNum}.</strong> ${task.text}</div>
                     <div class="input-group">
                         <input type="text" id="input${taskNum}" placeholder="Wpisz równanie...">
-                        <button onclick="checkAnswer('input${taskNum}', 'card${taskNum}', 'feedback${taskNum}', ${answersJson}, 'btn-answer${taskNum}')">Sprawdź</button>
-                        <button class="btn-hint" onclick="toggleHint('hint${taskNum}')">Podpowiedź</button>
+                        <button onclick="checkAnswer(${taskNum}, 'input${taskNum}', 'card${taskNum}', 'feedback${taskNum}', ${answersJson}, 'btn-answer${taskNum}')">Sprawdź</button>
+                        <button class="btn-hint" onclick="document.getElementById('hint${taskNum}').style.display='block'">Podpowiedź</button>
                         
-                        <button class="btn-answer" id="btn-answer${taskNum}" style="display: none;" onclick="showAnswer('input${taskNum}', '${firstAnswer}', 'card${taskNum}', 'feedback${taskNum}', 'btn-answer${taskNum}')">Odpowiedź</button>
+                        <button class="btn-answer" id="btn-answer${taskNum}" style="display: none;" onclick="showAnswer(${taskNum}, 'input${taskNum}', '${firstAnswer}', 'card${taskNum}', 'feedback${taskNum}', 'btn-answer${taskNum}')">Odpowiedź</button>
                         
                         <span id="feedback${taskNum}" class="feedback"></span>
                     </div>
-                    <div id="hint${taskNum}" class="hint-text">
-                        ${task.hint}
-                    </div>
+                    <div id="hint${taskNum}" class="hint-text">${task.hint}</div>
                 </div>
             `;
-            container.innerHTML += taskHTML;
         });
 
-        function toggleHint(hintId) {
-            let hintElement = document.getElementById(hintId);
-            if (hintElement.style.display === "block") {
-                hintElement.style.display = "none";
-            } else {
-                hintElement.style.display = "block";
-            }
-        }
-
-        // Улучшенная функция проверки с учетом уникальных попыток
-        function checkAnswer(inputId, cardId, feedbackId, correctAnswers, btnAnswerId) {
+        function checkAnswer(taskNum, inputId, cardId, feedbackId, correctAnswers, btnAnswerId) {
             let userInput = document.getElementById(inputId).value;
-            let feedbackElement = document.getElementById(feedbackId);
-            let cardElement = document.getElementById(cardId);
+            let feedbackEl = document.getElementById(feedbackId);
+            let cardEl = document.getElementById(cardId);
             let btnAnswer = document.getElementById(btnAnswerId);
             
-            cardElement.classList.remove("correct-bg", "incorrect-bg");
+            cardEl.classList.remove("correct-bg", "incorrect-bg");
 
-            let normalizedInput = userInput.replace(/\s+/g, '').toLowerCase();
-            let inputWithDot = normalizedInput.replace(',', '.');
-            let inputWithComma = normalizedInput.replace('.', ',');
+            let normalized = userInput.replace(/\s+/g, '').toLowerCase().replace(',', '.');
+            if (normalized === "") return (feedbackEl.textContent = "Wpisz odpowiedź!", feedbackEl.className = "feedback incorrect");
 
-            if (normalizedInput === "") {
-                feedbackElement.textContent = "Wpisz odpowiedź!";
-                feedbackElement.className = "feedback incorrect";
-                return;
-            }
+            if (userAttempts[inputId] === undefined) userAttempts[inputId] = new Set();
 
-            // Создаем множество для этого поля, если его еще нет
-            if (userAttempts[inputId] === undefined) {
-                userAttempts[inputId] = new Set();
-            }
-
-            let isCorrect = correctAnswers.some(answer => 
-                answer.toLowerCase() === normalizedInput || 
-                answer.toLowerCase() === inputWithDot ||
-                answer.toLowerCase() === inputWithComma
-            );
+            let isCorrect = correctAnswers.some(ans => ans.toLowerCase() === normalized || ans.toLowerCase().replace('.', ',') === normalized.replace('.', ','));
 
             if (isCorrect) {
-                feedbackElement.textContent = "Dobrze!";
-                feedbackElement.className = "feedback correct";
-                cardElement.classList.add("correct-bg");
-                btnAnswer.style.display = "none"; 
-            } else {
-                // Если ответ неверный, проверяем, вводил ли ученик его раньше
-                if (userAttempts[inputId].has(normalizedInput)) {
-                    feedbackElement.textContent = "Już podałeś taką odpowiedź. Spróbuj inną!";
-                } else {
-                    // Если это новый неправильный ответ, добавляем его в память
-                    userAttempts[inputId].add(normalizedInput);
-                    feedbackElement.textContent = "Spróbuj jeszcze raz.";
-                }
-
-                feedbackElement.className = "feedback incorrect";
-                cardElement.classList.add("incorrect-bg");
+                feedbackEl.textContent = "Dobrze!"; 
+                feedbackEl.className = "feedback correct"; 
+                cardEl.classList.add("correct-bg");
+                btnAnswer.style.display = "none";
                 
-                // Если накопилось 2 ИЛИ БОЛЕЕ РАЗНЫХ неправильных ответов — показываем кнопку
+                // Записываем, что решил сам, только если до этого не нажимал "Odpowiedź"
+                if(resultsData[taskNum] !== "Podglądał odpowiedź") {
+                    resultsData[taskNum] = "Samodzielnie";
+                }
+            } else {
+                if (userAttempts[inputId].has(normalized)) {
+                    feedbackEl.textContent = "Już podałeś taką odpowiedź. Spróbuj inną!";
+                } else {
+                    userAttempts[inputId].add(normalized);
+                    feedbackEl.textContent = "Spróbuj jeszcze raz.";
+                }
+                feedbackEl.className = "feedback incorrect"; 
+                cardEl.classList.add("incorrect-bg");
+                
+                // Показываем кнопку ответа после 2 уникальных ошибок
                 if (userAttempts[inputId].size >= 2) {
                     btnAnswer.style.display = "inline-block";
                 }
             }
         }
 
-        // Функция для показа правильного ответа
-        function showAnswer(inputId, correctAnswer, cardId, feedbackId, btnAnswerId) {
-            let inputElement = document.getElementById(inputId);
-            let cardElement = document.getElementById(cardId);
-            let feedbackElement = document.getElementById(feedbackId);
-            let btnAnswer = document.getElementById(btnAnswerId);
+        function showAnswer(taskNum, inputId, correctAnswer, cardId, feedbackId, btnAnswerId) {
+            document.getElementById(inputId).value = correctAnswer;
+            document.getElementById(cardId).classList.remove("incorrect-bg");
+            document.getElementById(cardId).classList.add("correct-bg");
+            document.getElementById(feedbackId).innerHTML = "Oto prawidłowa odpowiedź!";
+            document.getElementById(feedbackId).className = "feedback correct";
+            document.getElementById(btnAnswerId).style.display = "none";
             
-            // Вписываем правильный ответ
-            inputElement.value = correctAnswer;
-            
-            // Делаем карточку зеленой
-            cardElement.classList.remove("incorrect-bg");
-            cardElement.classList.add("correct-bg");
-            
-            // Хвалим и прячем кнопку ответа
-            feedbackElement.innerHTML = "Oto prawidłowa odpowiedź!";
-            feedbackElement.className = "feedback correct";
-            btnAnswer.style.display = "none";
+            // Отмечаем, что ответ был подсмотрен
+            resultsData[taskNum] = "Podglądał odpowiedź";
+        }
+
+        // ОТПРАВКА НА ПОЧТУ
+        function sendResults() {
+            let correctCount = 0; let hintCount = 0; let notSolvedCount = 0;
+            let detailedReport = "";
+
+            for(let i=1; i<=20; i++) {
+                if(resultsData[i] === "Samodzielnie") correctCount++;
+                else if(resultsData[i] === "Podglądał odpowiedź") hintCount++;
+                else notSolvedCount++;
+                detailedReport += `Zadanie ${i}: ${resultsData[i]}\n`;
+            }
+
+            const finalMessage = `Uczeń: ${currentStudent}
+Klasa: ${currentClass}
+
+WYNIK GŁÓWNY:
+- Rozwiązane samodzielnie: ${correctCount} z 20
+- Z użyciem gotowej odpowiedzi: ${hintCount} z 20
+- Brak odpowiedzi: ${notSolvedCount} z 20
+
+SZCZEGÓŁY:
+${detailedReport}`;
+
+            const btnSubmit = document.getElementById("btn-submit");
+            btnSubmit.textContent = "Wysyłanie...";
+            btnSubmit.style.backgroundColor = "#7f8c8d";
+            btnSubmit.disabled = true;
+
+            // Отправка через Web3Forms (С ВАШИМ КЛЮЧОМ)
+            fetch('https://api.web3forms.com/submit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify({
+                    access_key: "99356b6c-ab77-4ea0-a3cb-99560d40fafa", // Ваш уникальный ключ
+                    subject: `Wyniki równań: ${currentStudent} (${currentClass})`,
+                    from_name: "Test Matematyczny",
+                    message: finalMessage
+                })
+            })
+            .then(async (response) => {
+                if (response.status == 200) {
+                    document.getElementById("finish-text").innerText = "Udało się! Wyniki zostały wysłane do nauczyciela. Możesz zamknąć stronę.";
+                    btnSubmit.style.display = "none";
+                } else {
+                    document.getElementById("finish-text").innerText = "Błąd wysyłania. Zgłoś to nauczycielowi.";
+                    btnSubmit.textContent = "Spróbuj ponownie";
+                    btnSubmit.disabled = false;
+                    btnSubmit.style.backgroundColor = "#e74c3c";
+                }
+            })
+            .catch(error => {
+                console.log(error);
+                document.getElementById("finish-text").innerText = "Błąd połączenia. Sprawdź internet i spróbuj ponownie.";
+                btnSubmit.textContent = "Wyślij";
+                btnSubmit.disabled = false;
+                btnSubmit.style.backgroundColor = "#e74c3c";
+            });
         }
     </script>
 </body>
