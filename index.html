@@ -1,307 +1,169 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="UTF-8">
-  <title>Trener matematyki — mnożenie</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin: 20px;
-      background-image: url("background.jpg");
-      background-size: cover;
-      background-position: center;
-      background-attachment: fixed;
-    }
-    .container {
-      background: rgba(255,255,255,0.85);
-      border-radius: 15px;
-      padding: 20px 40px;
-      display: inline-block;
-      margin-bottom: 30px;
-    }
-    h1, h2 { margin-bottom: 10px; }
-    .task { font-size: 26px; margin: 20px; }
-    input {
-      width: 80px;
-      font-size: 20px;
-      text-align: center;
-      margin: 5px;
-      padding: 5px;
-      border: 2px solid #aaa;
-      border-radius: 5px;
-      transition: all 0.3s;
-    }
-    input.error { background: #f8d7da; border-color: red; }
-    input.correct { background: #d4edda; border-color: green; }
-    .row {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 20px;
-      margin: 10px;
-    }
-    .block {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .result { margin: 20px; font-size: 20px; font-weight: bold; transition: color 0.3s; }
-    button {
-      margin: 10px;
-      padding: 10px 20px;
-      font-size: 18px;
-      cursor: pointer;
-      border-radius: 10px;
-      border: none;
-      background-color: #007bff;
-      color: white;
-      transition: background 0.3s;
-    }
-    button:hover { background-color: #0056b3; }
-    .success-animate { animation: pulse 0.5s ease-in-out; }
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-      100% { transform: scale(1); }
-    }
-    svg { overflow: visible; }
-
-    /* Popup уровень */
-    #levelUpPopup {
-      display:none;
-      position:fixed;
-      top:50%;
-      left:50%;
-      transform:translate(-50%,-50%);
-      background: rgba(255,255,255,0.95);
-      border: 2px solid #007bff;
-      border-radius:15px;
-      padding:30px;
-      z-index:1000;
-      text-align:center;
-      box-shadow: 0 0 15px rgba(0,0,0,0.3);
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Do czego służą równania</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        .description {
+            text-align: center;
+            font-size: 1.1em;
+            margin-bottom: 30px;
+            color: #555;
+        }
+        .task-card {
+            background: #fff;
+            padding: 20px 25px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-left: 5px solid #3498db;
+        }
+        .task-text {
+            font-size: 1.1em;
+            margin-bottom: 15px;
+        }
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        input[type="text"] {
+            padding: 10px;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            flex-grow: 1;
+            max-width: 300px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus {
+            border-color: #3498db;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1em;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .feedback {
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .correct {
+            color: #27ae60;
+        }
+        .incorrect {
+            color: #e74c3c;
+        }
+    </style>
 </head>
 <body>
-  <div class="container" id="main">
-    <h1>🧮 Trener mnożenia</h1>
 
-    <div class="task" id="task"></div>
+    <h1>Do czego służą równania</h1>
+    <p class="description">Zapisz podane sytuacje w postaci równań. Używaj małych liter (np. x, y).</p>
 
-    <div style="font-size:22px; font-weight:bold; margin-bottom:10px;">
-      Liczba do rozłożenia: <span id="mainNumber"></span>
+    <div class="task-card">
+        <div class="task-text">
+            <strong>1.</strong> Zapisz podane zdanie w postaci równania:<br>
+            <em>Jeżeli liczbę x powiększymy o 15, to otrzymamy 42.</em>
+        </div>
+        <div class="input-group">
+            <input type="text" id="input1" placeholder="Wpisz równanie...">
+            <button onclick="checkAnswer('input1', 'feedback1', ['x+15=42', '15+x=42'])">Sprawdź</button>
+            <span id="feedback1" class="feedback"></span>
+        </div>
     </div>
 
-    <div class="row" id="tensRow">
-      <div class="block" id="blockTens">
-        <input id="tens" placeholder="dziesiątki">
-      </div>
-      <div class="block" id="blockOnes">
-        <input id="ones" placeholder="jedności">
-      </div>
+    <div class="task-card">
+        <div class="task-text">
+            <strong>2.</strong> Zapisz sytuację za pomocą równania:<br>
+            <em>Za książkę i zakładkę Tomek zapłacił 45 zł. Książka była 4 razy droższa od zakładki. Oznacz cenę zakładki literą x.</em>
+        </div>
+        <div class="input-group">
+            <input type="text" id="input2" placeholder="Wpisz równanie...">
+            <button onclick="checkAnswer('input2', 'feedback2', ['x+4x=45', '4x+x=45', '5x=45'])">Sprawdź</button>
+            <span id="feedback2" class="feedback"></span>
+        </div>
     </div>
 
-    <div class="row">
-      <div id="operator" style="font-size:22px; font-weight:bold;"></div>
+    <div class="task-card">
+        <div class="task-text">
+            <strong>3.</strong> Zapisz zdanie w postaci równania:<br>
+            <em>Liczba o 20% mniejsza od y jest równa 64.</em>
+        </div>
+        <div class="input-group">
+            <input type="text" id="input3" placeholder="Wpisz równanie...">
+            <button onclick="checkAnswer('input3', 'feedback3', ['y-0.2y=64', '0.8y=64', 'y-20%y=64'])">Sprawdź</button>
+            <span id="feedback3" class="feedback"></span>
+        </div>
+    </div>
+    
+    <div class="task-card">
+        <div class="task-text">
+            <strong>4.</strong> Zapisz poniższy tekst za pomocą równania:<br>
+            <em>Marek rozwiązał x zadań, a Sylwia o 5 zadań więcej. Razem rozwiązali 25 zadań.</em>
+        </div>
+        <div class="input-group">
+            <input type="text" id="input4" placeholder="Wpisz równanie...">
+            <button onclick="checkAnswer('input4', 'feedback4', ['x+x+5=25', '2x+5=25', 'x+(x+5)=25'])">Sprawdź</button>
+            <span id="feedback4" class="feedback"></span>
+        </div>
     </div>
 
-    <div id="arrowRow" style="display:flex; justify-content:center; gap:200px; margin-bottom:10px;">
-      <svg width="400" height="100">
-        <defs>
-          <marker id="arrow" markerWidth="10" markerHeight="10" refX="5" refY="3" orient="auto">
-            <path d="M0,0 L0,6 L9,3 z" fill="black"/>
-          </marker>
-        </defs>
-        <line x1="100" y1="0" x2="100" y2="60" stroke="black" stroke-width="2" marker-end="url(#arrow)"/>
-        <line x1="300" y1="0" x2="300" y2="60" stroke="black" stroke-width="2" marker-end="url(#arrow)"/>
-      </svg>
-    </div>
+    <script>
+        function checkAnswer(inputId, feedbackId, correctAnswers) {
+            // Pobieramy wartość od użytkownika
+            let userInput = document.getElementById(inputId).value;
+            let feedbackElement = document.getElementById(feedbackId);
+            
+            // Usuwamy wszystkie spacje i zamieniamy na małe litery, żeby sprawdzanie było mniej restrykcyjne
+            let normalizedInput = userInput.replace(/\s+/g, '').toLowerCase();
+            // Przecinki dziesiętne zmieniamy na kropki (jeśli ktoś wpisze np. 0,8 zamiast 0.8)
+            normalizedInput = normalizedInput.replace(',', '.');
 
-    <div class="row" id="partRow" style="justify-content:center; gap:10px; margin-bottom:20px;">
-      <input id="part1" placeholder="..." style="width:100px; text-align:center;">
-      <span style="font-size:24px; font-weight:bold;">+</span>
-      <input id="part2" placeholder="..." style="width:100px; text-align:center;">
-    </div>
-
-    <div style="display:flex; justify-content:center; gap:80px; margin-bottom:10px;">
-      <svg width="400" height="80">
-        <defs>
-          <marker id="arrow2" markerWidth="10" markerHeight="10" refX="5" refY="3" orient="auto">
-            <path d="M0,0 L0,6 L9,3 z" fill="black"/>
-          </marker>
-        </defs>
-        <line x1="100" y1="0" x2="175" y2="50" stroke="black" stroke-width="2" marker-end="url(#arrow2)"/>
-        <line x1="300" y1="0" x2="225" y2="50" stroke="black" stroke-width="2" marker-end="url(#arrow2)"/>
-      </svg>
-    </div>
-
-    <div>
-      <input id="final" placeholder="wynik" style="width:100px; text-align:center;">
-    </div>
-
-    <div class="result" id="result"></div>
-    <button id="actionBtn">Sprawdź i dalej</button>
-    <div id="stats" style="margin-top:15px; font-weight:bold; color:#333;"></div>
-  </div>
-
-  <!-- Popup уровень -->
-  <div id="levelUpPopup">
-    <p style="font-size:18px; margin-bottom:20px;">Brawo! 🧠 Chcesz przejść do poziomu 50-99?</p>
-    <button id="levelYes" style="margin-right:10px;">TAK</button>
-    <button id="levelNo">NIE</button>
-  </div>
-
-  <script>
-    class MathTrainer {
-      constructor() {
-        this.el = {
-          tens: document.getElementById("tens"),
-          ones: document.getElementById("ones"),
-          part1: document.getElementById("part1"),
-          part2: document.getElementById("part2"),
-          final: document.getElementById("final"),
-          result: document.getElementById("result"),
-          task: document.getElementById("task"),
-          operator: document.getElementById("operator"),
-          stats: document.getElementById("stats"),
-          actionBtn: document.getElementById("actionBtn"),
-          main: document.getElementById("main"),
-          mainNumber: document.getElementById("mainNumber"),
-          popup: document.getElementById("levelUpPopup"),
-          yesBtn: document.getElementById("levelYes"),
-          noBtn: document.getElementById("levelNo")
-        };
-
-        this.correct = 0;
-        this.total = 0;
-        this.streak = 0;
-        this.awaitingNext = false;
-        this.startTime = null;
-
-        this.minNumber = 10;
-        this.maxNumber = 50;
-        this.splitEnabled = true;
-
-        this.el.actionBtn.addEventListener("click", () => this.handleAction());
-        this.nextTask();
-      }
-
-      generateNumbers() {
-        this.number = Math.floor(Math.random() * (this.maxNumber - this.minNumber + 1)) + this.minNumber;
-        this.other = Math.floor(Math.random() * 9) + 1;
-        this.tens = Math.floor(this.number / 10) * 10;
-        this.ones = this.number % 10;
-        this.correctPart1 = this.tens * this.other;
-        this.correctPart2 = this.ones * this.other;
-        this.correctFinal = this.correctPart1 + this.correctPart2;
-      }
-
-      nextTask() {
-        this.generateNumbers();
-        this.el.task.textContent = `${this.number} × ${this.other} = ?`;
-        this.el.operator.textContent = `× ${this.other}`;
-        this.el.mainNumber.textContent = this.number;
-
-        document.getElementById("tensRow").style.display="flex";
-        document.getElementById("partRow").style.display="flex";
-
-        this.el.result.textContent = "";
-        this.clearInputs();
-        this.startTime = Date.now();
-        this.el.tens.focus();
-      }
-
-      clearInputs() {
-        ["tens","ones","part1","part2","final"].forEach(id => {
-          const el = this.el[id];
-          el.value = "";
-          el.className = "";
-        });
-      }
-
-      handleAction() {
-        if(this.awaitingNext) {
-          this.awaitingNext = false;
-          this.el.actionBtn.textContent = "Sprawdź i dalej";
-          this.nextTask();
-        } else {
-          this.check();
-        }
-      }
-
-      check() {
-        const {tens, ones, part1, part2, final, result, stats, main} = this.el;
-        const userTens = parseInt(tens.value);
-        const userOnes = parseInt(ones.value);
-        const userPart1 = parseInt(part1.value);
-        const userPart2 = parseInt(part2.value);
-        const userFinal = parseInt(final.value);
-
-        let errors = [];
-        let ok = true;
-
-        if(tens.value !== "" && userTens !== this.tens){ tens.className="error"; errors.push("dziesiątki"); ok=false; }
-        else if(tens.value !== "") tens.className="correct";
-
-        if(ones.value !== "" && userOnes !== this.ones){ ones.className="error"; errors.push("jedności"); ok=false; }
-        else if(ones.value !== "") ones.className="correct";
-
-        if(part1.value !== "" && userPart1 !== this.correctPart1){ part1.className="error"; errors.push("część 1"); ok=false; }
-        else if(part1.value !== "") part1.className="correct";
-
-        if(part2.value !== "" && userPart2 !== this.correctPart2){ part2.className="error"; errors.push("część 2"); ok=false; }
-        else if(part2.value !== "") part2.className="correct";
-
-        if(userFinal !== this.correctFinal){ final.className="error"; ok=false; errors.push("wynik końcowy"); }
-        else final.className="correct";
-
-        const elapsed = ((Date.now()-this.startTime)/1000).toFixed(1);
-
-        this.total++;
-        if(ok) {
-          this.correct++;
-          this.streak++;
-          result.style.color="green";
-          result.textContent=`Brawo! 🎉 Poprawna odpowiedź: ${this.correctFinal}`;
-          main.classList.add("success-animate");
-          setTimeout(()=>main.classList.remove("success-animate"),600);
-
-          if(this.streak % 5 === 0){
-            this.el.popup.style.display = "block";
-
-            this.el.yesBtn.onclick = () => {
-              this.minNumber = 50;
-              this.maxNumber = 99;
-              this.awaitingNext = false; // сброс флага, чтобы первый пример проверялся
-              this.el.popup.style.display = "none";
-              this.nextTask();
+            if (normalizedInput === "") {
+                feedbackElement.textContent = "Wpisz odpowiedź!";
+                feedbackElement.className = "feedback incorrect";
+                return;
             }
 
-            this.el.noBtn.onclick = () => {
-              this.awaitingNext = false; // тоже сброс
-              this.el.popup.style.display = "none";
-              this.nextTask();
+            // Sprawdzamy, czy odpowiedź użytkownika znajduje się na liście prawidłowych odpowiedzi
+            let isCorrect = correctAnswers.some(answer => answer.toLowerCase() === normalizedInput);
+
+            if (isCorrect) {
+                feedbackElement.textContent = "Dobrze!";
+                feedbackElement.className = "feedback correct";
+            } else {
+                feedbackElement.textContent = "Spróbuj jeszcze raz.";
+                feedbackElement.className = "feedback incorrect";
             }
-          }
-
-          if(this.streak % 10 === 0) result.textContent += " 🥇";
-          if(this.streak % 20 === 0) result.textContent += " 🎉";
-
-          this.awaitingNext=true;
-          this.el.actionBtn.textContent="Następny przykład →";
-        } else {
-          this.streak = 0;
-          result.style.color="red";
-          result.textContent=`Błąd w: ${errors.join(", ")}. Spróbuj ponownie!`;
         }
-
-        stats.textContent=`Poprawnych: ${this.correct}/${this.total} (${Math.round(this.correct/this.total*100)}%), czas: ${elapsed}s`;
-      }
-    }
-
-    new MathTrainer();
-  </script>
+    </script>
 </body>
 </html>
