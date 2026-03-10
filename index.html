@@ -34,6 +34,16 @@
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
             border-left: 5px solid #3498db;
+            transition: background-color 0.4s, border-color 0.4s;
+        }
+        /* Классы для правильного и неправильного ответа */
+        .task-card.correct-bg {
+            background-color: #d4edda;
+            border-left-color: #28a745;
+        }
+        .task-card.incorrect-bg {
+            background-color: #f8d7da;
+            border-left-color: #dc3545;
         }
         .task-text {
             font-size: 1.1em;
@@ -55,9 +65,6 @@
             outline: none;
             transition: border-color 0.3s;
         }
-        input[type="text"]:focus {
-            border-color: #3498db;
-        }
         button {
             background-color: #3498db;
             color: white;
@@ -71,15 +78,30 @@
         button:hover {
             background-color: #2980b9;
         }
+        /* Кнопка подсказки */
+        button.btn-hint {
+            background-color: #f39c12;
+        }
+        button.btn-hint:hover {
+            background-color: #d68910;
+        }
         .feedback {
             font-weight: bold;
             margin-left: 10px;
         }
-        .correct {
-            color: #27ae60;
-        }
-        .incorrect {
-            color: #e74c3c;
+        .correct { color: #1e8449; }
+        .incorrect { color: #c0392b; }
+        
+        /* Блок с текстом подсказки (скрыт по умолчанию) */
+        .hint-text {
+            display: none;
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #fdf2e9;
+            border-left: 4px solid #e67e22;
+            font-style: italic;
+            color: #d35400;
+            border-radius: 0 4px 4px 0;
         }
     </style>
 </head>
@@ -88,63 +110,91 @@
     <h1>Do czego służą równania</h1>
     <p class="description">Zapisz podane sytuacje w postaci równań. Używaj małych liter (np. x, y).</p>
 
-    <div class="task-card">
+    <div class="task-card" id="card1">
         <div class="task-text">
             <strong>1.</strong> Zapisz podane zdanie w postaci równania:<br>
             <em>Jeżeli liczbę x powiększymy o 15, to otrzymamy 42.</em>
         </div>
         <div class="input-group">
             <input type="text" id="input1" placeholder="Wpisz równanie...">
-            <button onclick="checkAnswer('input1', 'feedback1', ['x+15=42', '15+x=42'])">Sprawdź</button>
+            <button onclick="checkAnswer('input1', 'card1', 'feedback1', ['x+15=42', '15+x=42'])">Sprawdź</button>
+            <button class="btn-hint" onclick="toggleHint('hint1')">Podpowiedź</button>
             <span id="feedback1" class="feedback"></span>
+        </div>
+        <div id="hint1" class="hint-text">
+            Słowo "powiększymy o" oznacza w matematyce dodawanie (+). Słowo "otrzymamy" to znak równości (=).
         </div>
     </div>
 
-    <div class="task-card">
+    <div class="task-card" id="card2">
         <div class="task-text">
             <strong>2.</strong> Zapisz sytuację za pomocą równania:<br>
             <em>Za książkę i zakładkę Tomek zapłacił 45 zł. Książka była 4 razy droższa od zakładki. Oznacz cenę zakładki literą x.</em>
         </div>
         <div class="input-group">
             <input type="text" id="input2" placeholder="Wpisz równanie...">
-            <button onclick="checkAnswer('input2', 'feedback2', ['x+4x=45', '4x+x=45', '5x=45'])">Sprawdź</button>
+            <button onclick="checkAnswer('input2', 'card2', 'feedback2', ['x+4x=45', '4x+x=45', '5x=45'])">Sprawdź</button>
+            <button class="btn-hint" onclick="toggleHint('hint2')">Podpowiedź</button>
             <span id="feedback2" class="feedback"></span>
+        </div>
+        <div id="hint2" class="hint-text">
+            Jeśli zakładka kosztuje "x", to 4 razy droższa książka kosztuje "4x". Dodaj te dwie wartości do siebie.
         </div>
     </div>
 
-    <div class="task-card">
+    <div class="task-card" id="card3">
         <div class="task-text">
             <strong>3.</strong> Zapisz zdanie w postaci równania:<br>
             <em>Liczba o 20% mniejsza od y jest równa 64.</em>
         </div>
         <div class="input-group">
             <input type="text" id="input3" placeholder="Wpisz równanie...">
-            <button onclick="checkAnswer('input3', 'feedback3', ['y-0.2y=64', '0.8y=64', 'y-20%y=64'])">Sprawdź</button>
+            <button onclick="checkAnswer('input3', 'card3', 'feedback3', ['y-0.2y=64', '0.8y=64', 'y-20%y=64'])">Sprawdź</button>
+            <button class="btn-hint" onclick="toggleHint('hint3')">Podpowiedź</button>
             <span id="feedback3" class="feedback"></span>
+        </div>
+        <div id="hint3" class="hint-text">
+            Cała liczba y to 100%. Jeśli zabierzemy z niej 20%, zostanie nam 80% tej liczby (co zapisujemy jako 0,8y).
         </div>
     </div>
     
-    <div class="task-card">
+    <div class="task-card" id="card4">
         <div class="task-text">
             <strong>4.</strong> Zapisz poniższy tekst za pomocą równania:<br>
             <em>Marek rozwiązał x zadań, a Sylwia o 5 zadań więcej. Razem rozwiązali 25 zadań.</em>
         </div>
         <div class="input-group">
             <input type="text" id="input4" placeholder="Wpisz równanie...">
-            <button onclick="checkAnswer('input4', 'feedback4', ['x+x+5=25', '2x+5=25', 'x+(x+5)=25'])">Sprawdź</button>
+            <button onclick="checkAnswer('input4', 'card4', 'feedback4', ['x+x+5=25', '2x+5=25', 'x+(x+5)=25'])">Sprawdź</button>
+            <button class="btn-hint" onclick="toggleHint('hint4')">Podpowiedź</button>
             <span id="feedback4" class="feedback"></span>
+        </div>
+        <div id="hint4" class="hint-text">
+            Zapisz ilość zadań Sylwii jako (x + 5). Aby dowiedzieć się, ile zrobili razem, dodaj zadania Marka i zadania Sylwii.
         </div>
     </div>
 
     <script>
-        function checkAnswer(inputId, feedbackId, correctAnswers) {
-            // Pobieramy wartość od użytkownika
+        // Funkcja pokazywania/ukrywania podpowiedzi
+        function toggleHint(hintId) {
+            let hintElement = document.getElementById(hintId);
+            if (hintElement.style.display === "block") {
+                hintElement.style.display = "none";
+            } else {
+                hintElement.style.display = "block";
+            }
+        }
+
+        // Zaktualizowana funkcja sprawdzania odpowiedzi
+        function checkAnswer(inputId, cardId, feedbackId, correctAnswers) {
             let userInput = document.getElementById(inputId).value;
             let feedbackElement = document.getElementById(feedbackId);
+            let cardElement = document.getElementById(cardId);
             
-            // Usuwamy wszystkie spacje i zamieniamy na małe litery, żeby sprawdzanie było mniej restrykcyjne
+            // Resetujemy kolory tła przed każdym sprawdzeniem
+            cardElement.classList.remove("correct-bg", "incorrect-bg");
+
             let normalizedInput = userInput.replace(/\s+/g, '').toLowerCase();
-            // Przecinki dziesiętne zmieniamy na kropki (jeśli ktoś wpisze np. 0,8 zamiast 0.8)
             normalizedInput = normalizedInput.replace(',', '.');
 
             if (normalizedInput === "") {
@@ -153,15 +203,18 @@
                 return;
             }
 
-            // Sprawdzamy, czy odpowiedź użytkownika znajduje się na liście prawidłowych odpowiedzi
             let isCorrect = correctAnswers.some(answer => answer.toLowerCase() === normalizedInput);
 
             if (isCorrect) {
                 feedbackElement.textContent = "Dobrze!";
                 feedbackElement.className = "feedback correct";
+                // Dodajemy zielone tło
+                cardElement.classList.add("correct-bg");
             } else {
                 feedbackElement.textContent = "Spróbuj jeszcze raz.";
                 feedbackElement.className = "feedback incorrect";
+                // Dodajemy czerwone tło
+                cardElement.classList.add("incorrect-bg");
             }
         }
     </script>
