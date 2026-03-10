@@ -215,10 +215,10 @@
                     resultsData[taskNum] = "Samodzielnie";
                 }
             } else {
-                if (userAttempts[inputId].has(normalized)) {
+                if (userAttempts[inputId].has(userInput)) {
                     feedbackEl.textContent = "Już podałeś taką odpowiedź. Spróbuj inną!";
                 } else {
-                    userAttempts[inputId].add(normalized);
+                    userAttempts[inputId].add(userInput); // СОХРАНЯЕМ ИМЕННО ТО ЧТО ВВЕЛ УЧЕНИК
                     feedbackEl.textContent = "Spróbuj jeszcze raz.";
                 }
                 feedbackEl.className = "feedback incorrect"; 
@@ -247,16 +247,32 @@
             let detailedReport = "";
 
             for(let i=1; i<=20; i++) {
-                // Забираем то, что реально написано в окошке
-                let inputVal = document.getElementById('input' + i).value.trim();
-                let answerText = inputVal === "" ? "brak" : inputVal;
+                let inputId = 'input' + i;
+                let currentInputVal = document.getElementById(inputId).value.trim();
+                let attemptsSet = userAttempts[inputId];
+                // Достаем все ошибки ученика из нашей "памяти", через запятую
+                let wrongAttemptsString = (attemptsSet && attemptsSet.size > 0) ? Array.from(attemptsSet).join(", ") : "";
 
-                if(resultsData[i] === "Samodzielnie") correctCount++;
-                else if(resultsData[i] === "Podglądał odpowiedź") hintCount++;
-                else notSolvedCount++;
-                
-                // Добавляем к отчету текст ответа
-                detailedReport += `Zadanie ${i}: ${resultsData[i]} (Wpisano: ${answerText})\n`;
+                if(resultsData[i] === "Samodzielnie") {
+                    correctCount++;
+                    if (wrongAttemptsString !== "") {
+                        detailedReport += `Zadanie ${i}: Samodzielnie (Błędy przed sukcesem: ${wrongAttemptsString} | Odpowiedź końcowa: ${currentInputVal})\n`;
+                    } else {
+                        detailedReport += `Zadanie ${i}: Samodzielnie (Odpowiedź: ${currentInputVal})\n`;
+                    }
+                }
+                else if(resultsData[i] === "Podglądał odpowiedź") {
+                    hintCount++;
+                    detailedReport += `Zadanie ${i}: Podglądał odpowiedź (Błędne próby ucznia: ${wrongAttemptsString || "brak, od razu nacisnął podpowiedź"})\n`;
+                }
+                else {
+                    notSolvedCount++;
+                    if (wrongAttemptsString !== "") {
+                        detailedReport += `Zadanie ${i}: Nie rozwiązano (Błędne próby: ${wrongAttemptsString})\n`;
+                    } else {
+                        detailedReport += `Zadanie ${i}: Nie rozwiązano (Pole puste)\n`;
+                    }
+                }
             }
 
             const finalMessage = `Uczeń: ${currentStudent}
