@@ -140,7 +140,7 @@
             document.getElementById("app-content").style.display = "block";
         }
 
-        // БАЗА ЗАДАНИЙ С КАРТИНКАМИ
+        // БАЗА ЗАДАНИЙ
         const tasksData = [
             { text: "Jeżeli liczbę x powiększymy o 12, to otrzymamy 41.", hint: "Słowo 'powiększymy o' oznacza w matematyce dodawanie (+).", answers: ["x+12=41", "12+x=41"] },
             { text: "Liczba 27 jest 2 razy większa od x.", hint: "Zapisz '2 razy większa od x' jako 2x.", answers: ["2x=27", "2*x=27", "27=2x", "27=2*x"] },
@@ -168,7 +168,7 @@
 
         tasksData.forEach((task, index) => {
             const taskNum = index + 1;
-            resultsData[taskNum] = "Nie rozwiązano"; // Начальный статус для отчета
+            resultsData[taskNum] = "Nie rozwiązano"; 
 
             const answersJson = JSON.stringify(task.answers).replace(/"/g, "'");
             const firstAnswer = task.answers[0];
@@ -211,7 +211,6 @@
                 cardEl.classList.add("correct-bg");
                 btnAnswer.style.display = "none";
                 
-                // Записываем, что решил сам, только если до этого не нажимал "Odpowiedź"
                 if(resultsData[taskNum] !== "Podglądał odpowiedź") {
                     resultsData[taskNum] = "Samodzielnie";
                 }
@@ -225,7 +224,6 @@
                 feedbackEl.className = "feedback incorrect"; 
                 cardEl.classList.add("incorrect-bg");
                 
-                // Показываем кнопку ответа после 2 уникальных ошибок
                 if (userAttempts[inputId].size >= 2) {
                     btnAnswer.style.display = "inline-block";
                 }
@@ -240,20 +238,25 @@
             document.getElementById(feedbackId).className = "feedback correct";
             document.getElementById(btnAnswerId).style.display = "none";
             
-            // Отмечаем, что ответ был подсмотрен
             resultsData[taskNum] = "Podglądał odpowiedź";
         }
 
-        // ОТПРАВКА НА ПОЧТУ
+        // ОБНОВЛЕННАЯ ФУНКЦИЯ ОТПРАВКИ НА ПОЧТУ
         function sendResults() {
             let correctCount = 0; let hintCount = 0; let notSolvedCount = 0;
             let detailedReport = "";
 
             for(let i=1; i<=20; i++) {
+                // Забираем то, что реально написано в окошке
+                let inputVal = document.getElementById('input' + i).value.trim();
+                let answerText = inputVal === "" ? "brak" : inputVal;
+
                 if(resultsData[i] === "Samodzielnie") correctCount++;
                 else if(resultsData[i] === "Podglądał odpowiedź") hintCount++;
                 else notSolvedCount++;
-                detailedReport += `Zadanie ${i}: ${resultsData[i]}\n`;
+                
+                // Добавляем к отчету текст ответа
+                detailedReport += `Zadanie ${i}: ${resultsData[i]} (Wpisano: ${answerText})\n`;
             }
 
             const finalMessage = `Uczeń: ${currentStudent}
@@ -272,7 +275,6 @@ ${detailedReport}`;
             btnSubmit.style.backgroundColor = "#7f8c8d";
             btnSubmit.disabled = true;
 
-            // Отправка через Web3Forms (С ВАШИМ КЛЮЧОМ)
             fetch('https://api.web3forms.com/submit', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
