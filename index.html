@@ -7,10 +7,13 @@
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            /* Красивый фон "в точечку" (эффект тетради) */
-            background-color: #fdfbfb;
-            background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px);
-            background-size: 25px 25px;
+            /* Измененный фон: теперь используется background.jpg */
+            background-image: url('background.jpg');
+            background-size: cover; /* Растянуть изображение на весь экран */
+            background-position: center;
+            background-attachment: fixed; /* Зафиксировать фон при прокрутке */
+            background-repeat: no-repeat;
+            
             color: #333;
             line-height: 1.6;
             padding: 20px;
@@ -18,10 +21,10 @@
             margin: 0 auto;
         }
         .header-container {
-            background: rgba(255, 255, 255, 0.9);
-            padding: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
             border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             margin-bottom: 30px;
         }
         h1 {
@@ -45,7 +48,10 @@
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
             border-left: 6px solid #3498db;
-            transition: background-color 0.4s, border-color 0.4s;
+            transition: background-color 0.4s, border-color 0.4s, transform 0.2s;
+        }
+        .task-card:hover {
+            transform: translateY(-2px);
         }
         .task-card.correct-bg {
             background-color: #d4edda;
@@ -59,14 +65,15 @@
             font-size: 1.1em;
             margin-bottom: 15px;
         }
-        .visual-desc {
-            background-color: #f8f9fa;
-            border: 1px dashed #adb5bd;
-            padding: 10px;
-            border-radius: 6px;
-            margin-top: 5px;
-            font-family: monospace;
-            display: inline-block;
+        /* Стиль для встроенной картинки (весов) */
+        .task-image {
+            max-width: 100%;
+            height: auto;
+            margin-top: 10px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: block;
         }
         .input-group {
             display: flex;
@@ -123,18 +130,18 @@
 
     <div class="header-container">
         <h1>Do czego służą równania</h1>
-        <p class="description">Zapisz podane sytuacje w postaci równań. Używaj małych liter (np. x, y). Nie musisz ich jeszcze rozwiązywać!</p>
+        <p class="description">Zapisz podane sytuacje w postaci równań. Używaj małych liter (np. x, y). Не забудьте загрузить фоновое изображение (background.jpg) и иллюстрацию весов (weight_scale.png) в ту же папку на GitHub!</p>
     </div>
 
     <div id="tasks-container">
         </div>
 
     <script>
-        // BAZA ZADAŃ (Tutaj możesz łatwo dodawać nowe!)
+        // БАЗА ЗADAŃ
         const tasksData = [
             {
                 text: "Jeżeli liczbę x powiększymy o 12, to otrzymamy 41.",
-                hint: "Słowo 'powiększymy o' oznacza w matematyce dodawanie (+).",
+                hint: "Słowo 'powiększymy o' oznacza matematyce dodawanie (+).",
                 answers: ["x+12=41", "12+x=41"]
             },
             {
@@ -160,7 +167,7 @@
             {
                 text: "Za długopis i ołówek Magda zapłaciła 4,20 zł. Długopis był dwa razy droższy od ołówka. Oznacz cenę ołówka literą x.",
                 hint: "Ołówek to x, długopis to 2x. Dodaj je do siebie.",
-                answers: ["x+2x=4.20", "2x+x=4.20", "3x=4.20"]
+                answers: ["x+2x=4.20", "2x+x=4.20", "3x=4.20", "x+2x=4,20", "2x+x=4,20", "3x=4,20"]
             },
             {
                 text: "Suma dwóch liczb, z których jedna jest 5,2 razy większa od drugiej, wynosi 23,48. (Mniejsza liczba to x)",
@@ -168,18 +175,19 @@
                 answers: ["x+5.2x=23.48", "5.2x+x=23.48", "6.2x=23.48"]
             },
             {
-                text: "Waga pozostaje w równowadze.<br><span class='visual-desc'>⚖️ Lewa szalka: [x kg] i [1 kg] | Prawa szalka: [1 kg][1 kg][1 kg][1 kg][1 kg]</span>",
-                hint: "Na lewej stronie masz x + 1, a na prawej masz 5 odważników jednokilogramowych.",
-                answers: ["x+1=5", "1+x=5"]
+                // ЗАМЕНЕННОЕ ЗАДАНИЕ С КАРТИНКОЙ
+                text: "Waga pozostaje w równowadze. Zapisz równanie na podstawie ilustracji:<br><img src='weight_scale.png' alt='Ilustracja wagi' class='task-image'>",
+                hint: "Waga w równowadze oznacza, że lewa strona (=szalka) jest równa prawej stronie.",
+                answers: ["x+1=5", "1+x=5", "x+1kg=5kg"]
             },
             {
-                text: "Odcinek o długości 30 został podzielony na dwie części. Jedna ma długość 3, a druga x.<br><span class='visual-desc'>|--- 3 ---|--------- x ---------| (całość to 30)</span>",
+                text: "Odcinek o długości 30 został podzielony na dwie części. Jedna ma długość 3, a druga x.",
                 hint: "Suma obu części odcinka daje nam całość, czyli 30.",
-                answers: ["3+x=30", "x+3=30"]
+                answers: ["3+x=30", "x+3=30", "30-x=3"]
             },
             {
                 text: "Trójkąt prostokątny ma obwód równy 70 cm. Długości jego boków to: k, (k + 1) oraz (k + 9).",
-                hint: "Obwód to suma wszystkich boków. Dodaj je wszystkie do siebie i przyrównaj do 70.",
+                hint: "Obwód to suma wszystkich boków. Dodaj je wszystkie do siebie и приравняй к 70.",
                 answers: ["k+k+1+k+9=70", "k+(k+1)+(k+9)=70", "3k+10=70"]
             },
             {
@@ -203,24 +211,24 @@
                 answers: ["x+x+0.05x=82", "x+1.05x=82", "2.05x=82", "x+(x+0.05x)=82"]
             },
             {
-                text: "Za korektor i kątomierz Ola zapłaciła 3,50 zł. Korektor był cztery razy droższy od kątomierza. Jeśli x to cena kątomierza, to:",
+                text: "Za korektor и kątomierz Ola zapłaciła 3,50 zł. Korektor był cztery razy droższy od kątomierza. Jeśli x to cena kątomierza, to:",
                 hint: "Kątomierz = x, Korektor = 4x.",
-                answers: ["x+4x=3.50", "4x+x=3.50", "5x=3.50", "x+4x=3.5"]
+                answers: ["x+4x=3.50", "4x+x=3.50", "5x=3.50", "x+4x=3.5", "5x=3,5"]
             },
             {
                 text: "Trójkąt prostokątny ma boki: k, (k + 3) oraz (k + 6). Jego obwód wynosi 36 cm.",
-                hint: "Dodaj wszystkie trzy boki i przyrównaj je do 36.",
+                hint: "Dodaj wszystkie trzy boki и приравняй к 36.",
                 answers: ["k+k+3+k+6=36", "k+(k+3)+(k+6)=36", "3k+9=36"]
             },
             {
-                text: "Waga jest w równowadze.<br><span class='visual-desc'>⚖️ Lewa szalka: [x kg][1 kg] | Prawa szalka: [1 kg][1 kg][1 kg][1 kg]</span>",
-                hint: "Zlicz odważniki po prawej stronie.",
+                text: "Waga pozostaje w równowadze. Lewa szalka: [x kg] и [1 kg] | Prawa szalka: [1 kg][1 kg][1 kg][1 kg]",
+                hint: "Waga w równowadze означает, что левая сторона равна правой.",
                 answers: ["x+1=4", "1+x=4"]
             },
             {
-                text: "Odcinek długości 80 podzielono na dwie części.<br><span class='visual-desc'>|--------- x ---------|--- 8 ---| (całość to 80)</span>",
-                hint: "Część x dodać część 8 daje całe 80.",
-                answers: ["x+8=80", "8+x=80"]
+                text: "Odcinek długości 80 podzielono na dwie części. Jedna мает długość x, a druga 8.",
+                hint: "Część x dodać część 8 дает całe 80.",
+                answers: ["x+8=80", "8+x=80", "80-x=8"]
             },
             {
                 text: "Suma dwóch liczb, z których jedna jest 7,23 razy większa od drugiej, wynosi 32,92. (Mniejsza to x).",
@@ -260,7 +268,7 @@
             container.innerHTML += taskHTML;
         });
 
-        // Funkcja pokazywania/ukrywania podpowiedzi
+        // Funkcja pokazywania/ukrywania подpowiedзи
         function toggleHint(hintId) {
             let hintElement = document.getElementById(hintId);
             if (hintElement.style.display === "block") {
@@ -278,7 +286,7 @@
             
             cardElement.classList.remove("correct-bg", "incorrect-bg");
 
-            // Oczyszczanie wpisu: usuwamy spacje, zamieniamy przecinki na kropki
+            // Oczyszczanie wpisu: usuwamy spacje, zamieniamy przecinki на kropki
             let normalizedInput = userInput.replace(/\s+/g, '').toLowerCase();
             normalizedInput = normalizedInput.replace(',', '.');
 
